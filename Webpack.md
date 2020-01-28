@@ -1,4 +1,4 @@
-![webpack打包](D:\notes\Vue\img\12.webpack\webpack打包.png)
+![webpack打包](C:\Users\lenovo\Desktop\5天背诵\img\webpack\webpack打包.png)
 
 
 
@@ -69,11 +69,11 @@ npm install webpack@3.6.0 --save-dev // 开发时依赖
 
 安装：
 
-![loader-css](D:\notes\Vue\img\12.webpack\loader-css.png)
+![loader-css](C:\Users\lenovo\Desktop\5天背诵\img\webpack\loader-css.png)
 
 配置：[官网]( https://webpack.js.org/loaders/css-loader/ )
 
-![loaders](D:\notes\Vue\img\12.webpack\loaders.png)
+![loaders](C:\Users\lenovo\Desktop\5天背诵\img\webpack\loaders.png)
 
 ```shell
 // 安装css-loader
@@ -81,7 +81,7 @@ npm install --save-dev css-loader
 // 配置,官网上有呢
 ```
 
-![cssloader配置](D:\notes\Vue\img\12.webpack\cssloader配置.png)
+![cssloader配置](C:\Users\lenovo\Desktop\5天背诵\img\webpack\cssloader配置.png)
 
 ```shell
 // 安装style-loader
@@ -97,11 +97,11 @@ npm install --save-dev style-loader
 
 首先创建一个`less`文件，随便写一些东西，然后在入口函数中引入该文件。
 
-![less处理](D:\notes\Vue\img\12.webpack\less处理.png)
+![less处理](C:\Users\lenovo\Desktop\5天背诵\img\webpack\less处理.png)
 
 去[官网]( https://www.webpackjs.com/loaders/less-loader/ )进行下载配置。
 
-![less配置](D:\notes\Vue\img\12.webpack\less配置.png)
+![less配置](C:\Users\lenovo\Desktop\5天背诵\img\webpack\less配置.png)
 
 
 
@@ -117,11 +117,11 @@ npm install --save-dev style-loader
 
 首先导入一张小于`8kb`的图片，并成功引用。
 
-![图片配置](D:\notes\Vue\img\12.webpack\图片配置.jpg)
+![图片配置](C:\Users\lenovo\Desktop\5天背诵\img\webpack\图片配置.jpg)
 
 下载并配置：
 
-![图片处理2](D:\notes\Vue\img\12.webpack\图片处理2.jpg)
+![图片处理2](C:\Users\lenovo\Desktop\5天背诵\img\webpack\图片处理2.jpg)
 
 ---
 
@@ -131,9 +131,9 @@ npm install --save-dev style-loader
 
 ==注意==：此时我们打包超过`limit`大小的图片会重新生成在`dist`文件中，但如果我们想要对图片进行管理（命名，导出位置）等，还需要进行以下配置：
 
-![图片处理3](D:\notes\Vue\img\12.webpack\图片处理3.jpg)
+![图片处理3](C:\Users\lenovo\Desktop\5天背诵\img\webpack\图片处理3.jpg)
 
-![大尺寸图片处理](D:\notes\Vue\img\12.webpack\大尺寸图片处理.jpg)
+![大尺寸图片处理](C:\Users\lenovo\Desktop\5天背诵\img\webpack\大尺寸图片处理.jpg)
 
 
 
@@ -146,7 +146,7 @@ npm install --save-dev style-loader
 npm install --save-dev babel-loader@7 babel-core babel-preset-es2015
 ```
 
-![es6转为es5](D:\notes\Vue\img\12.webpack\es6转为es5.jpg)
+![es6转为es5](C:\Users\lenovo\Desktop\5天背诵\img\webpack\es6转为es5.jpg)
 
 
 
@@ -177,27 +177,27 @@ resolve: {
 }
 ```
 
-![vue的配置](D:\notes\Vue\img\12.webpack\vue的配置.jpg)
+![vue的配置](C:\Users\lenovo\Desktop\5天背诵\img\webpack\vue的配置.jpg)
 
-![vue配置2](D:\notes\Vue\img\12.webpack\vue配置2.jpg)
+![vue配置2](C:\Users\lenovo\Desktop\5天背诵\img\webpack\vue配置2.jpg)
 
 
 
 # `el`和`template`之间的关系
 
-![el和template](D:\notes\Vue\img\12.webpack\el和template.jpg)
+![el和template](C:\Users\lenovo\Desktop\5天背诵\img\webpack\el和template.jpg)
 
 简化上述代码：提取出`template`、`data`、`methods`
 
-![简化](D:\notes\Vue\img\12.webpack\简化.jpg)
+![简化](C:\Users\lenovo\Desktop\5天背诵\img\webpack\简化.jpg)
 
 将定义组件部分再次提取出来
 
-![简化2](D:\notes\Vue\img\12.webpack\简化2.jpg)
+![简化2](C:\Users\lenovo\Desktop\5天背诵\img\webpack\简化2.jpg)
 
 再次简化
 
-![简化3](D:\notes\Vue\img\12.webpack\简化3.jpg)
+![简化3](C:\Users\lenovo\Desktop\5天背诵\img\webpack\简化3.jpg)
 
 
 
@@ -214,15 +214,15 @@ npm install vue-loader vue-template-compiler --save-dev
 
 配置：
 
-![配置运行vue文件](D:\notes\Vue\img\12.webpack\配置运行vue文件.jpg)
+![配置运行vue文件](C:\Users\lenovo\Desktop\5天背诵\img\webpack\配置运行vue文件.jpg)
 
 根组件`App.vue`引用其他组件
 
-![组件的使用](D:\notes\Vue\img\12.webpack\组件的使用.jpg)
+![组件的使用](C:\Users\lenovo\Desktop\5天背诵\img\webpack\组件的使用.jpg)
 
 扩展名的简写配置：
 
-![配置扩展名](D:\notes\Vue\img\12.webpack\配置扩展名.jpg)
+![配置扩展名](C:\Users\lenovo\Desktop\5天背诵\img\webpack\配置扩展名.jpg)
 
 
 
@@ -248,7 +248,7 @@ npm install vue-loader vue-template-compiler --save-dev
 
 为打包的文件添加一个版权信息。
 
-![插件1](D:\notes\Vue\img\12.webpack\插件1.jpg)
+![插件1](C:\Users\lenovo\Desktop\5天背诵\img\webpack\插件1.jpg)
 
 
 
@@ -263,9 +263,9 @@ npm install html-webpack-plugin --save-dev
 
 配置：
 
-![生成html的配置1](D:\notes\Vue\img\12.webpack\生成html的配置1.jpg)
+![生成html的配置1](C:\Users\lenovo\Desktop\5天背诵\img\webpack\生成html的配置1.jpg)
 
-![html打包最终示意图](D:\notes\Vue\img\12.webpack\html打包最终示意图.jpg)
+![html打包最终示意图](C:\Users\lenovo\Desktop\5天背诵\img\webpack\html打包最终示意图.jpg)
 
 ## `uglifyjs-webpack-plugin`
 
@@ -278,9 +278,9 @@ npm install html-webpack-plugin --save-dev
 npm install uglifyjs-webpack-plugin@1.1.1 --save-dev
 ```
 
-![压缩js](D:\notes\Vue\img\12.webpack\压缩js.jpg)
+![压缩js](C:\Users\lenovo\Desktop\5天背诵\img\webpack\压缩js.jpg)
 
-![注意版本号](D:\notes\Vue\img\12.webpack\注意版本号.jpg)
+![注意版本号](C:\Users\lenovo\Desktop\5天背诵\img\webpack\注意版本号.jpg)
 
 
 
@@ -291,7 +291,7 @@ npm install uglifyjs-webpack-plugin@1.1.1 --save-dev
 npm install webpack-dev-server@2.9.3 --save-dev
 ```
 
-![搭建服务器](D:\notes\Vue\img\12.webpack\搭建服务器.jpg)
+![搭建服务器](C:\Users\lenovo\Desktop\5天背诵\img\webpack\搭建服务器.jpg)
 
 通过`npm run dev`就可以将项目跑起来了。
 
@@ -311,7 +311,7 @@ npm install webpack-dev-server@2.9.3 --save-dev
 
   也就是说，当我们配置分离完成之后，`webpack.config.js`文件就没有用处了。
 
-![分散配置](D:\notes\Vue\img\12.webpack\分散配置.jpg)
+![分散配置](C:\Users\lenovo\Desktop\5天背诵\img\webpack\分散配置.jpg)
 
 ```shell
 // 用于将我们的配置文件进行合并处理
@@ -320,23 +320,23 @@ npm install webpack-merge --save-dev
 
 **公共部分配置**：
 
-![公共代码部分](D:\notes\Vue\img\12.webpack\公共代码部分.jpg)
+![公共代码部分](C:\Users\lenovo\Desktop\5天背诵\img\webpack\公共代码部分.jpg)
 
 **开发部分配置**：
 
-![开发部分](D:\notes\Vue\img\12.webpack\开发部分.jpg)
+![开发部分](C:\Users\lenovo\Desktop\5天背诵\img\webpack\开发部分.jpg)
 
 **生产部分配置**
 
-![生产部分](D:\notes\Vue\img\12.webpack\生产部分.jpg)
+![生产部分](C:\Users\lenovo\Desktop\5天背诵\img\webpack\生产部分.jpg)
 
 **最后指令的修改**：
 
-![指令的修改](D:\notes\Vue\img\12.webpack\指令的修改.jpg)
+![指令的修改](C:\Users\lenovo\Desktop\5天背诵\img\webpack\指令的修改.jpg)
 
 完事之后，我们执行`npm run bulid`会发现项目被自动打包到了
 
-![输出路径](D:\notes\Vue\img\12.webpack\输出路径.jpg)
+![输出路径](C:\Users\lenovo\Desktop\5天背诵\img\webpack\输出路径.jpg)
 
 按照我们的规则，他会先根据`base.config.js`的位置，在其同级新建一个`dist`文件夹，然后进行打包输出。这不是我们想要得到的最终结果。
 
