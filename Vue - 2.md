@@ -1,0 +1,1547 @@
+组件化
+
+## 步骤
+
+- `Vue.extend()`创建组件构造器 
+
+- `Vue.component()`注册组件
+
+
+
+## 全局组件和局部组件
+
+```html
+<body>
+   <div id="app">
+      <my-com1></my-com1>
+      <my-com2></my-com2>
+   </div>
+   <template id="aim1">
+      <div>
+         <h1>全局组件 - {{ msg }}</h1>
+      </div>
+   </template>
+   <template id="aim2">
+      <div>
+         <h3>局部组件</h3>
+      </div>
+   </template>
+   <script>
+      Vue.component('myCom1', {
+         template: '#aim1',
+         data() {
+            return {
+               msg: 'sxw'
+            }
+         }
+      })
+      const app = new Vue({
+         el: '#app',
+         components: {
+            myCom2: {
+               template: '#aim2'
+            }
+         }
+      })
+   </script>
+</body>
+```
+
+
+
+## 组件切换
+
+```html
+<body>
+   <div id="app">
+      <a href="" @click.prevent="flag = true">登录</a>
+      <a href="" @click.prevent="flag = false">注册</a>
+      <my-com1 v-if="flag"></my-com1>
+      <my-com2 v-else></my-com2>
+   </div>
+   <script>
+      Vue.component('myCom1', {
+         template: '<h1>登录</h1>'
+      })
+      Vue.component('myCom2', {
+         template: '<h2>注册</h2>'
+      })
+      const app = new Vue({
+         el: '#app',
+         data: {
+            flag: true
+         }
+      })
+   </script>
+</body>
+```
+
+
+
+## 组件切换动画过渡
+
+```html
+<style>
+   .v-enter,
+   .v-leave-to {
+      opacity: 0;
+      transform: translateX(150px);
+   }
+   .v-enter-active,
+   .v-leave-active {
+      transition: all 0.5s ease;
+   }
+</style>
+<body>
+   <div id="app">
+      <a href="" @click.prevent="comName='myCom1'">登录</a>
+      <a href="" @click.prevent="comName='myCom2'">注册</a>
+      <transition mode="out-in">
+         <component :is="comName"></component>
+      </transition>
+   </div>
+   <script>
+      Vue.component('myCom1', {
+         template: '<h1>登录</h1>'
+      })
+      Vue.component('myCom2', {
+         template: '<h2>注册</h2>'
+      })
+      const app = new Vue({
+         el: '#app',
+         data: {
+            comName: 'myCom1'
+         }
+      })
+   </script>
+</body>
+```
+
+
+
+## 父子组件通信
+
+```html
+<!-- 父传子 -->
+<body>
+   <div id="app">
+      <!-- 2.以属性绑定的形式,将父组件中的 msg 传递给子组件,子组件接收保存为 parentmsg  -->
+      <com :parentmsg="msg"></com>
+   </div>
+   <script>
+      const app = new Vue({
+         el: '#app',
+         data: {
+            msg: 'sxw' // 1.父组件数据
+         },
+         components: {
+            com: {
+               template: '<h1>子组件 - {{ parentmsg }}</h1>',
+               props: ['parentmsg'] // 3.从子组件接收到的数据在props数组中定义一下
+
+               // props的另一种写法,给与传递过来的参数以一定的限制
+				props: {
+                    cmessage: {
+                       type: String,
+                       default: '222', // 若不传参时的默认值
+                       // required: true 当前参数属性是必须的
+                    },
+                	cmovies: {
+                        type: Array,
+                        // 类型是对象或数组时,默认值必须是一个函数
+                        default() {
+                          return ['sxw']
+                        }
+                    }
+                }
+            }
+         }
+      })
+   </script>
+</body>
+```
+
+```html
+<!-- 子传父 -->
+<body>
+   <div id="app">
+      {{ fatherData }} <!-- 4.渲染子传父的数据是否成功 -->
+      <com1 @func="show"></com1> <!-- 2.将func给父组件show函数 -->
+   </div>
+   <template id="tmp">
+      <div>
+         <h1>子组件</h1>
+         <input type="button" value="子组件按钮" @click="sonClick">
+      </div>
+   </template>
+   <script>
+      Vue.component('com1', {
+         template: '#tmp',
+         data() {
+            return {
+               sonMsg: { name: '小头儿子', age: 3 }
+            }
+         },
+         methods: {
+            sonClick() {
+               // 1.
+               // func是什么?
+               // 将子组件中的数据通过$emit传递给参数func 
+               this.$emit('func', this.sonMsg)
+            }
+         }
+      })
+      const app = new Vue({
+         el: '#app',
+         data: {
+            fatherData: null
+         },
+         methods: {
+            show(dataFromSon) {
+               this.fatherData = dataFromSon // 3.转存一下传递过来的数据
+            }
+         }
+      })
+   </script>
+</body>
+```
+
+
+
+## 小案例
+
+```html
+<body>
+   <div id="app">
+      <cpn 
+         :sonnum1="num1" 
+         :sonnum2="num2" 
+         @num1change="num1change" 
+         @num2change="num2change" />
+   </div>
+   <template id="aim">
+      <div>
+         <h1>props,父级传递过来的原始数据：{{ sonnum1 }}</h1>
+         <h1>子组件中通过input改变之后的数据：{{ copesonnum1 }}</h1>
+         <!-- <input type="text" v-model="copesonnum1"> -->
+         <input type="text" :value="copesonnum1" @input="num1Input">
+         <h1>props,父级传递过来的原始数据：{{ sonnum2 }}</h1>
+         <h1>子组件中通过input改变之后的数据：{{ copesonnum2 }}</h1>
+         <!-- <input type="text" v-model="copesonnum2"> -->
+         <input type="text" :value="copesonnum2" @input="num2Input">
+      </div>
+   </template>
+   <script>
+      // 定义子组件
+      const cpn = {
+         template: '#aim',
+         props: {
+            sonnum1: Number,
+            sonnum2: Number
+         },
+         data() {
+            return {
+               copesonnum1: this.sonnum1,
+               copesonnum2: this.sonnum2
+            }
+         },
+         methods: {
+            num1Input(event) {
+               // 1.将 input 中的数值赋值给子组件中
+               this.copesonnum1 = parseInt(event.target.value)
+               // 2.将改变之后的数值发射给父级
+               this.$emit('num1change', this.copesonnum1)
+               // 3.满足我们第三个需求,修改 copesonnum1 的值,并且数值改变,必须重新发射给父组件
+               this.copesonnum2 = this.copesonnum1 * 100
+               // 将修改过的 copesonnum2 再次发射出去
+               this.$emit('num2change', this.copesonnum2)
+            },
+            num2Input(event) {
+               this.copesonnum2 = parseInt(event.target.value)
+               this.$emit('num2change', this.copesonnum2)
+               this.copesonnum1 = this.copesonnum2 / 100
+               this.$emit('num1change', this.copesonnum1) 
+            }
+         }
+      }
+      const app = new Vue({
+         el: '#app',
+         data: {
+            num1: 1,
+            num2: 2
+         },
+         methods: {
+            num1change(value) {
+               this.num1 = value
+            },
+            num2change(value) {
+               this.num2 = value
+            }
+         },
+         components: {
+            cpn
+         }
+      })
+   </script>
+</body>
+
+<script>
+// 实现三个需求:
+// 1.双向数据绑定,将input框中输入的内容绑定到子组件中,并且呈现出来;
+// 我们之前使用input的双向数据绑定,绑定的都是data中的数据,但是这里子组件接收父组件传递过来的数据是保存在props里面,虽然我们也可以将props中的数据直接绑定input中,但是会报错。
+// Vue官方推荐我们将props中接收到的子组件传递过来的数据拷贝一份放到子组件中的data里,然后再调用。
+
+// 2.通过input框触发改变子组件中的数据,并且将数据发射给父组件,从而也改变父组件中的数据;
+// 我们应该将v-model拆分成v-bind和v-on两个指令来进行表示,更加方便我们的业务逻辑处理操作;
+// 子向父传值,在input框的点击事件中,通过$emit('新建一个事件名称', 要改变的数值),将改变之后的数值通过新建的事件发射出去,然后去到结构中,添加上input触发所创建的新的事件,并回到父组件中进行相应的业务逻辑处理
+
+// 3.要求上一个data中显示的数字永远是下一个data显示数字的100倍;反之,下面data永远要显示成为上面data的1/100倍,特别应该注意的一点是,当子组件中的数据发生变化之后,必须重新再发射给父组件一次,用来更新界面显示数据
+</script>
+```
+
+
+
+## 父子组件的访问方式
+
+有时需要父组件直接访问子组件，子组件直接访问父组件，或是子组件访问根组件
+
+- 父组件访问子组件：`$children` （使用较少）或`$refs`
+- 子组件访问父组件：`$parent` 组件之间耦合度太高，导致了可复用性不强
+- 子组件访问根组件：`$root`（使用较少）
+
+```html
+<body>
+   <div id="app">
+      <cpn ref="sxw"></cpn>
+      <button @click="btnClick">按钮</button>
+   </div>
+   <template id="aim">
+      <div>
+         <p>我是子组件</p>
+      </div>
+   </template>
+   <script>
+      const cpn = {
+         template: '#aim',
+         data() {
+            return {
+               name: '我是子组件中的数据'
+            }
+         },
+         methods: {
+            sonMessage() {
+               console.log('我是子组件中的数据...')
+            }
+         }
+      }
+      const app = new Vue({
+         el: '#app',
+         methods: {
+            btnClick() {
+               // 父组件访问到了子组件中的数据
+               console.log(this.$refs.sxw)
+               console.log(this.$refs.sxw.name)
+            }
+         },
+         components: {
+            cpn
+         }
+      })
+   </script>
+</body>
+```
+
+
+
+## `ref`获取`DOM`元素
+
+```html
+<body>
+   <div id="app">
+      <input type="button" value="获取元素" @click="getElement">
+      <!-- 测试 -->
+      <h1 id="myEle" ref="myEle">被获取的元素</h1>
+	  <!-- 测试 -->
+      <login ref="mylogin"></login>
+   </div>
+   <script>
+      var login = {
+         template: '<h1>登录组件</h1>',
+         data() {
+            return {
+               msg: 'son msg'
+            }
+         },
+         methods: {
+            show() {
+               console.log('子组件的方法...')
+            }
+         }
+      }
+      const app = new Vue({
+         el: '#app',
+         methods: {
+            getElement() {
+               // 获取文本内容
+               // console.log(document.getElementById('myEle').innerHTML)
+               // console.log(this.$refs.myEle.innerHTML)
+               
+               // console.log(this.$refs.mylogin.msg) // 获取子组件中的数据
+               this.$refs.mylogin.show() // 获取子组件中的方法
+            }
+         },
+         components: {
+            login
+         }
+      })
+   </script>
+</body>
+```
+
+
+
+## `slot`插槽
+
+使封装的组件更具有扩展性。
+
+```html
+<body>
+   <div id="app">
+      <cpn><button>按钮</button></cpn>
+      <cpn><span>哈哈</span></cpn>
+      <cpn><a href="#">嘿嘿</a></cpn>
+      <cpn></cpn>
+   </div>
+   <template id="aim">
+      <div>
+         <h1>我是组件</h1>
+         <p>我是组件内容</p>
+         <slot><button>如果你使用的时候不给我传递参数,就用这个插槽默认值</button></slot>
+      </div>
+   </template>
+   <script>
+      const cpn = {
+         template: '#aim'
+      }
+      const app = new Vue({
+         el: '#app',
+         components: {
+            cpn
+         }
+      })
+   </script>
+</body>
+```
+
+
+
+### 具名插槽
+
+```html
+<body>
+   <div id="app">
+      <!-- 将name值为center的插槽内容替换 -->
+      <cpn><span slot="center">标题</span></cpn>
+      <cpn><button slot="left">返回</button></cpn>
+   </div>
+   <template id="aim">
+      <div>
+         <slot name="left"><span>左边</span></slot>
+         <slot name="center"><span>中间</span></slot>
+         <slot name="right"><span>右边</span></slot>
+      </div>
+   </template>
+   <script>
+      const cpn = {
+         template: '#aim'
+      }
+      const app = new Vue({
+         el: '#app',
+         components: {
+            cpn
+         }
+      })
+   </script>
+</body>
+```
+
+
+
+### 作用域插槽
+
+父组件替换插槽的标签，但是内容由子组件来提供。
+
+父组件对子组件展示的数据不满意，想以另一种形式进行展示。
+
+```html
+<body>
+   <div id="app">
+      <cpn></cpn>
+      <cpn>
+         <!-- 目的是获取子组件中的language -->
+         <!-- 2.通过slot-scope="slot"拿到插槽对象 -->
+         <template slot-scope="slot">
+            <!-- 3. .data就是下面 :data="language" 传递接收到的数据 -->
+            <!-- 以 - 进行分割 -->
+            <!-- <span v-for="item in slot.data">{{ item }} - </span> -->
+            <span>{{ slot.data.join(' - ') }}</span>
+         </template>
+      </cpn>
+   </div>
+   <template id="aim">
+      <div>
+         <!-- 1.通过:data="language"将父组件中的数据传递给子组件 -->
+         <slot :data="language">
+            <ul>
+               <li v-for="item in language">{{ item }}</li>
+            </ul>
+         </slot>
+      </div>
+   </template>
+   <script>
+      const cpn = {
+         template: '#aim',
+         data() {
+            return {
+               // 子组件中的数据
+               language: ['js','py','c++','java','go']
+            }
+         }
+      }
+      const app = new Vue({
+         el: '#app',
+         components: {
+            cpn
+         }
+      })
+   </script>
+</body>
+</html>
+```
+
+
+
+## 全局引用组件 
+
+```js
+import Server from "./server.vue" // 引入组件 
+Vue.component("app-server",Server) // 注册组件 
+<app-server></app-server> // 使用组件
+```
+
+
+
+## 局部引用组件
+
+```html
+<script>
+   import Header from "./components/Header" // 引入组件
+   exoprt default{
+      components: {
+         'app-header': Header // 注册组件
+      }
+   }
+</script>
+<app-header></app-header> // 使用组件
+```
+
+
+
+# `Promise`
+
+```js
+new Promise((resolve,reject) => {
+	setTimeout(() => {
+		resolve() // 成功时调用,外面就会相应执行.then函数
+	}, 1000)
+}).then(() => {
+	// .then函数中又传入一个函数
+	console.log('111')
+	return new Promise((resolve,reject) => {
+		setTimeout(() => {
+			resolve()
+		}, 1000)
+	})
+}).then(() => {
+	console.log('222')
+	return new Promise((resolve,reject) => {
+		setTimeout(() => {
+			reject('error message')
+		}, 1000)
+	})
+}).catch((err) => {
+	console.log(err)
+})
+```
+
+
+
+## 三种状态
+
+- `pending`：等待状态，比如正在进行网络请求，或者定时器没有到时间
+- `fulfill`：满足状态，当我们主动回调了`resolve`时就处于该状态，并且会回调`.then()`
+- `reject`：拒绝状态，当我们主动回调了`reject`时就处于该状态，并且会回调`.catch()`
+
+```js
+new Promise((resolve,reject) => {
+	setTimeout(() => {
+		// resolve('111')
+		reject('222')
+	}, 1000)
+}).then(data => { // 成功时候的回调
+	console.log(data)
+}, err => { // 失败时候的回调
+	console.log(err)
+})
+```
+
+```js
+// 省略掉Promise.resolve
+new Promise((resolve,reject) => {
+   setTimeout(() => {
+      resolve('aaa')
+   }, 1000)
+}).then(res => {
+   console.log(res,'第一次自己处理')
+   // return Promise.reject('error message')
+   throw 'error message'
+}).then(res => {
+   console.log(res, '第二次自己处理') // undefined 第二次处理
+   return res + '222' 
+}).then(res => {
+   console.log(res, '第三次自己处理') // undefined222 第三次处理
+}).catch(err => {
+   console.log(err)
+})
+```
+
+## `Promise.all`
+
+某个功能需要两次请求都完成时才能执行。
+
+```js
+Promise.all([new Promise(),new Promise()]).then()
+```
+
+```js
+Promise.all([
+   new Promise((resolve,reject) => {
+      setTimeout(() => {
+         resolve({name: 'sxw',age: 18})
+      }, 3000)
+   }),
+   new Promise((resolve,reject) => {
+      setTimeout(() => {
+         resolve({name: 'kobe',age: 19})
+      }, 2000)
+   }),
+]).then(results => {
+   console.log(results)
+})  
+```
+
+
+
+# 脚手架
+
+```
+vue init webpack my-project //生成vue cli2.X项目
+
+vue create my-project //生成vue cli3项目
+```
+
+![解析脚手架源码](C:\Users\lenovo\Desktop\5天背诵\img\vue\解析脚手架源码.jpg)
+
+
+
+# `runtime-compiler`和`runtime-only`
+
+![vue程序运行过程](C:\Users\lenovo\Desktop\5天背诵\img\vue\vue程序运行过程.jpg)
+
+- `runtimecompiler`：`recommended for most users`推荐大多数用户使用
+
+- `runtimeonly`：`about 6KB lighter min+zip...`
+
+==区别==：各自项目中的`main.js`文件。为什么`runtimeonly`会小`6KB`，就是因为他少了从`template` -> `ast` -> `render`这个步骤！
+
+模板 -> 编译 -> ast -> 数据 -> render函数 -> 虚拟dom -> 真实html
+当我们直接写`render`函数的时候就会忽略前面4个步骤，提高渲染效率。
+
+![比较](C:\Users\lenovo\Desktop\5天背诵\img\vue\比较.jpg)
+
+==解释==：将`App.vue`替换`App`时，`App.vue`中是有`template`模板的，那么就会去执行`template` -> `ast` -> `render`这个步骤，但是这是不需要的！
+
+之前我们去解决`.vue`文件的时候加载了两个插件`vue-template-compoiler`和`vue-loader`，其中第一个就是将`.vue`文件中的`template`模板解析成`render`函数的，所以也就省去了模板到`ast`到`render`函数这三个阶段。所以我们在引用`App`文件的时候，实际上引用的是解析完成之后的`App`对象，里面已经没有`template`模板对象了。
+
+```js
+// 用es6改写render函数
+new Vue({
+    el: '#app',
+    render: h => h(App)
+})
+```
+
+
+
+# `cli 3`
+
+- `vue cli3`是基于`webpack 4`打造的，而`vue cli2`是基于`webpack 3`
+- `vue cli3`的设计原则是0配置，移除了配置文件根目录下的`build`和`config`目录
+- `vue cli3`提供了`vue ui`命令，可视化配置
+- 移除了`static`文件夹，新增了`public`文件夹，并且`index.html`移动到`public`中
+
+
+
+# `Eslint`
+
+![esLint](C:\Users\lenovo\Desktop\5天背诵\img\vue\esLint.jpg)
+
+
+
+# `this`
+
+箭头函数中的`this`会向外层作用域中进行一层层查找，直到有`this`的定义。
+
+```js
+const obj = {
+    aaa() {
+        setTimeout(function() {
+            console.log(this); // window
+        }),
+        
+        setTimeout(() => {
+            console.log(this); // obj对象
+        })
+    }
+}
+obj.aaa()
+```
+
+```js
+const obj = {
+    aaa() {
+        setTimeout(function() {
+        	setTimeout(function() {
+                console.log(this) // window
+            })
+            
+            setTimeout(() => {
+                console.log(this) // window
+            })
+        }),
+        
+        setTimeout(() => {
+            setTimeout(function() {
+                console.log(this) // window
+            })
+            
+            setTimeout(() => {
+                console.log(this) // obj
+            })
+        })
+    }
+}
+obj.aaa()
+```
+
+
+
+# 路由
+
+## 后端渲染
+
+`jsp`（`java server page`）：`html` + `css` + `java`
+
+早期服务器直接渲染好对应的`html`页面，返回给客户端进行展示，利于`SEO`优化。
+
+缺点：由后端人员编写和维护，使用`php`或`java`编写页面，难以维护。
+
+## 前端路由
+
+`SPA`最主要的特点是在前后端分离的基础上加了一层前端路由，前端来维护一套路由规则，即改变`URL`，页面不刷新。
+
+缺点：
+
+- 第一次加载时会加载所有组件，不管当前用不用得到，导致首次加载较慢
+- 对`seo`不友好，由于我们是使用`js`动态往渲染的`id="app"`模板中替换组件的，有的爬虫爬不了`js`里面的内容时，爬虫只看到一个空的`html`
+
+## 两种模式
+
+### `hash`
+
+![路由](C:\Users\lenovo\Desktop\5天背诵\img\vue\路由.jpg)
+
+
+
+### `history`
+
+**`pushState`**
+
+![history](C:\Users\lenovo\Desktop\5天背诵\img\vue\history.jpg)
+
+**`replaceState`**
+
+![replaceState](C:\Users\lenovo\Desktop\5天背诵\img\vue\replaceState.jpg)
+
+**`go`**
+
+![go](C:\Users\lenovo\Desktop\5天背诵\img\vue\go.jpg)
+
+
+
+## `vue-router`
+
+```shell
+npm install vue-router --save
+```
+
+步骤：
+
+- 创建路由组件
+- 配置路由映射
+- 使用路由，`<router-link>`和`<router-view>`
+
+![router1](C:\Users\lenovo\Desktop\5天背诵\img\vue\router1.jpg)
+
+![router2](C:\Users\lenovo\Desktop\5天背诵\img\vue\router2.jpg)
+
+
+
+### 路由重定向`mode`属性
+
+```js
+const router = new VueRouter({
+    routes: [
+        {path: '/',redirect: '/home'}, // 路由重定向
+        {path: '/home',component: Home},
+        {path: '/about',component: About}
+    ],
+    mode: 'history' // url默认是hash模式,url中会带有#,不美观;我们将其改成H5中的history模式
+})
+```
+
+```js
+{
+   path: "*", // 权限最低
+   redirect: "..." // 当用户乱输东西的时候,重定向将其定向为404组件页面
+}
+```
+
+
+
+## `<router-link>`属性
+
+### `to`
+
+用于指定跳转的路径。
+
+
+
+### `tag`
+
+指定渲染成什么组件，默认渲染成`a`标签。
+
+```html
+<router-link to="/home" tag="button">渲染成button标签</router-link>
+```
+
+
+
+### `replace`
+
+切换组件时，默认使用的是`pushstate`的，也就是可以使用浏览器前进后退实现组件之间的切换。
+
+如果我们强制要求只让用户通过点击组件按钮才能实现组件之间的切换，需要添加上`replace`属性。
+
+```html
+<router-link to="/home" tag="button" replace>内容</router-link>
+```
+
+
+
+### `active-class`
+
+当`<router-link>`对应路由匹配成功时，会自动给匹配上的元素设置一个`router-link-active`的`class`。
+
+使用场景：在进行高亮显示导航菜单或者底部`tabbar`时，会用到该类。
+
+```html
+<router-link to="/home" tag="button" replace active-class="active">内容</router-link>
+
+// 通过上述修改已将默认生效的class名称修改为active
+.active{
+	color: red;
+}
+
+// 不过一般不进行修改,直接使用默认生效的 router-link-active
+.router-link-active{
+	color: red;
+}
+```
+
+还有一种方法可以统一修改处于活跃的组件`class`类名：
+
+```js
+const router = new VueRouter({
+    routes: [
+        {path: '/',redirect: '/home'},  
+        {path: '/home',component: Home},
+        {path: '/about',component: About}
+    ],
+    mode: 'history',
+	linkActiveClass: 'active' // 统一修改: 修改当前处于活跃的选项的class类名
+})
+```
+
+
+
+## 事件触发路由跳转
+
+```html
+<button @click="homeClick">首页</button>
+<button @click="aboutClick">关于</button>
+<script>
+    export default{
+        methods: {
+            homeClick() {
+                this.$router.push('/home')
+                // this.$router.replace('/home')
+            },
+            aboutClick() {
+                this.$router.push('/about')
+                // this.$router.replace('./home')
+            }
+        }
+    }
+</script>
+```
+
+---
+
+```html
+<button @click="gotoHome">回到首页</button>
+<script>
+   export default{
+      methods: {
+         gotoHome() {
+            this.$router.push({path: "/"})
+         }
+      }
+   }
+</script>
+```
+
+```html
+<router-link to="/user/1" tag="span">user1</router-link>
+```
+
+```js
+// router.js
+export default new vueRouter({ 
+   routes: [
+      {path: "/",component: Home},
+      {path: "/user/:id",component: Users} // 必须是user/一个随意的数才会跳转到User组件
+   ]
+})
+```
+
+```html
+user.vue 
+<script>
+   export default{
+      data() {
+         return {
+            id: this.$route.params.id // 接收用户传过来的id
+         }
+      },
+      watch: { // 在同一个组件之间进行切换,虚拟dom是不会重新渲染的,所以需要这里设置一下 
+         $route(to,from) {
+         	console.log(to)
+         	console.log(from)
+            this.id = to.params.id
+         }
+      },
+      methods: {
+         gotoHome() {
+            this.$router.push({path: "/"})
+         }
+      }
+   }
+</script>
+```
+
+
+
+## 动态路由`/user/:id`
+
+```js
+const router = new VueRouter({
+    routes: [ 
+        {path: '/user/:userId',component: User} 
+    ] 
+})
+```
+
+```html
+// 通过v-bind将data中的变量userId绑定到to属性后面
+<router-link :to="'/user/' + userId ">用户</router-link>
+<script>
+	export default{
+        data() {
+            return {
+                userId: 'sxw'
+            }
+        }
+    }
+</script>
+```
+
+## `this.$route.params.xxx`
+
+![在组件中获取到用户信息](C:\Users\lenovo\Desktop\5天背诵\img\vue\在组件中获取到用户信息.jpg)
+
+
+
+## 路由懒加载
+
+将路由所对应的组件打包成一个个`js`代码块，只当路由被访问时，才加载对应组件。
+
+![路由懒加载](C:\Users\lenovo\Desktop\5天背诵\img\vue\路由懒加载.jpg)
+
+```js
+import VueRouter from 'vue-router'
+import Vue from 'vue' 
+
+// import Home from '../components/About.vue'
+// import About from '../components/Home.vue'
+// import User from '../components/User.vue'
+const Home = () => import('../components/Home.vue')
+const About = () => import('../components/About.vue')
+const User = () => import('../components/User.vue')
+
+Vue.use(VueRouter)
+
+const router = new VueRouter({
+   routes: [
+      {path: '/',redirect: '/home'}, 
+      {path: '/home',component: Home},
+      {path: '/about',component: About},
+      {path: '/user/:abc',component: User}
+   ],
+   mode: 'history', 
+   linkActiveClass: 'active' 
+})
+
+export default router
+```
+
+
+
+## 路由嵌套
+
+![路由的嵌套](C:\Users\lenovo\Desktop\5天背诵\img\vue\路由的嵌套.jpg)
+
+![嵌套路由步骤](C:\Users\lenovo\Desktop\5天背诵\img\vue\嵌套路由步骤.jpg)
+
+
+
+## 传递参数的方式
+
+### `params`
+
+较少参数需要传递时，使用。
+
+```
+配置路由格式: /router/:id
+传递方式: 在path后面跟上对应的值
+传递后形成的路径: /router/123,/router/abc
+```
+
+
+
+### `query`
+
+较多参数需要传递时，使用。
+
+```
+配置路由格式: /router,普通配置
+传递方式: 对象中使用query的key作为传递方式
+传递后形成的路径: /router?id=123,/router?id=abc
+```
+
+![第二种传递参数的方式](C:\Users\lenovo\Desktop\5天背诵\img\vue\第二种传递参数的方式.jpg)
+
+![事件触发传递参数](C:\Users\lenovo\Desktop\5天背诵\img\vue\事件触发传递参数.jpg)
+
+
+
+## `$router`和`$route`
+
+- `this.$router`拿到的是路由对象，在所有文件中拿到的都是同一个路由对象。为`VueRouter`实例，想要导航到不同`URL`，则使用`$router.push`方法 
+- `this.$route`拿到的是当前活跃的路由对象。为当前`router`跳转对象里面可以获取`name`、`path`、`query`、`params`等
+
+
+
+## 导航守卫（拦截器）
+
+用于监听路由跳转过程，并在跳转期间进行操作。
+
+当用户要离开页面进行跳转时询问用户是否真的要离开。
+
+在我们点击不同路由跳转的时候，修改掉页面最上方的`title`数值。
+
+![路由守卫](C:\Users\lenovo\Desktop\5天背诵\img\vue\路由守卫.jpg)
+
+### 全局路由守卫
+
+```js
+// 路由守卫(前置钩子 hook)
+router.beforeEach((to, from, next) => { // 每次进入路由之前都会执行这个回调函数
+   // 从 from 跳转到 to
+   document.title = to.matched[0].meta.title
+   next() // 必须带上
+})
+
+// 后置钩子
+router.afterEach((to, from) => {
+   console.log('---')
+})
+```
+
+路由独享的守卫、组件内的守卫
+
+
+
+## `keep-alive`
+
+`keep-alive`是`vue`内置的一个组件，可使被包含的组件保留状态，避免重新渲染。
+
+`router-view`是一个组件，如果直接包在`keep-alive`里，所有路径匹配到的视图组件都会被缓存。
+
+```html
+<keep-alive>
+  <router-view></router-view>
+</keep-alive>
+```
+
+我们想要在`Home`组件中点击`B`组件之后，切到别的路由再切回来，页面还是显示我们离开之前的界面显示。
+
+首先我们先注释掉之前路由配置中的默认匹配显示`A`组件，然后来到`Home`组件中，定义了一个`data`，并将路径填写在这里。通过`activated`和`beforeRouteLeave`方法实现。
+
+==注意==：`activated`和`deactivated`这两个方法使用的前提必须是当前组件被保持了状态使用了`keep-alive`时，才是有效的！
+
+![keep-alive组件的深度使用](C:\Users\lenovo\Desktop\5天背诵\img\vue\keep-alive组件的深度使用.jpg)
+
+两个属性：
+
+- `include`：字符串或正则表达式，只有匹配的组件会被缓存
+- `exclude`：字符串或正则表达式，任何匹配的组件都不会被缓存
+  - 多个的话`exclude="Profile,User"`逗号隔开
+
+![keep-alive的属性](C:\Users\lenovo\Desktop\5天背诵\img\vue\keep-alive的属性.jpg)
+
+
+
+## 练习
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Document</title>
+  <script src="./vue.js"></script>
+  <!-- 1.当导入vue-router包之后,在window全局对象中,就有构造函数VueRouter -->
+  <script src="./vue-router-3.0.1.js"></script>
+  <style>
+    /* 图方便我们就把更改完成的新class类名和原来应用相同的样式了 */
+    .router-link-active,
+    .myactive {
+      color: red;
+      font-weight: 800;
+      font-style: italic;
+      font-size: 80px;
+      text-decoration: underline;
+      background-color: green;
+    }
+    /* 设置动画效果 */
+    .v-enter,
+    .v-leave-to {
+      opacity: 0;
+      transform: translateX(140px);
+    }
+    .v-enter-active,
+    .v-leave-active {
+      transition: all 0.5s ease;
+    }
+  </style>
+</head>
+<body>
+  <div id="app">
+   <router-link to="/login" tag="span">登录</router-link>
+   <router-link to="/register">注册</router-link>
+
+   <!-- 样式的切换是通过 router-link-active 这个类实现的,所以我们可以在style中为其添加自己的样式 -->
+   <transition mode="out-in">
+      <router-view></router-view>
+   </transition>
+  </div>
+  <script>
+   var login = {
+      template: '<h1>登录组件</h1>'
+   }
+   var register = {
+      template: '<h1>注册组件</h1>'
+   }
+   var routerObj = new VueRouter({
+      routes: [ 
+         { path: '/', redirect: '/login' },
+         { path: '/login', component: login },
+         { path: '/register', component: register }
+      ],
+      linkActiveClass: 'myactive' // 在路由配置对象中进行默认样式名的自定义更换
+   })
+   var vm = new Vue({
+      el: '#app',
+      router: routerObj // 将路由规则对象注册到vm实例上,用来监听URL地址的变化,然后展示对应的组件;
+   });
+  </script>
+</body>
+</html>
+```
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Document</title>
+  <script src="./vue.js"></script>
+  <script src="./vue-router-3.0.1.js"></script>
+</head>
+<body>
+  <div id="app">
+    <!-- 如果在路由中使用查询字符串给路由传递参数,则不需要修改路由规则的path属性 -->
+    <router-link to="/login?id=10&name=zs">登录</router-link>
+    <router-link to="/register">注册</router-link>
+    <!-- 放坑 -->
+    <router-view></router-view>
+  </div>
+  <script>
+    var login = {
+      template: '<h1>登录 -- {{ msg }} -- {{ $route.query.id }} --- {{ $route.query.name }}</h1>',
+      data(){
+        return {
+          msg: '123'
+        }
+      },
+      created(){ // 组件的生命周期函数
+        // console.log(this.$route)
+        // console.log(this.$route.query) 此处拿到 router-link 中传递的参数信息
+        // console.log(this.$route.query.id) 通过 .id / .name 取到结果
+      }
+    }
+    var register = {
+      template: '<h1>注册</h1>'
+    }
+
+    // 定义路由匹配规则
+    var router = new VueRouter({
+      routes: [
+        { path: '/login', component: login },
+        { path: '/register', component: register }
+      ]
+    })
+    
+    var vm = new Vue({
+      el: '#app',
+      router
+    });
+  </script>
+</body>
+</html>
+```
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Document</title>
+  <script src="./vue.js"></script>
+  <script src="./vue-router-3.0.1.js"></script>
+</head>
+<body>
+  <div id="app">
+    <!-- a.现实匹配 -->
+    <router-link to="/login/12/ls">登录</router-link>
+    <router-link to="/register">注册</router-link>
+    <router-view></router-view>
+  </div>
+  <script>
+    var login = { // c.连接a和b
+      template: '<h1>登录 --- {{ $route.params.id }} --- {{ $route.params.name }}</h1>',
+      data(){
+        return {
+          msg: '123'
+        }
+      },
+      created(){ 
+        console.log(this.$route.params.id)
+      }
+    }
+    var register = {
+      template: '<h1>注册</h1>'
+    }
+
+    var router = new VueRouter({
+      routes: [ // b.强制匹配规则 一定要有id && name,我才会匹配显示出后面的login组件
+        { path: '/login/:id/:name', component: login },
+        { path: '/register', component: register }
+      ]
+    })
+    var vm = new Vue({
+      el: '#app',
+      router
+    });
+  </script>
+</body>
+</html>
+```
+
+```html
+4.路由嵌套
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Document</title>
+  <script src="./vue.js"></script>
+  <script src="./vue-router-3.0.1.js"></script>
+</head>
+<body>
+  <div id="app">
+    <!-- 触发路由 -->
+    <router-link to="/account">Account</router-link>
+    <!-- 坑,用以展示组件 -->
+    <router-view></router-view>
+  </div>
+
+  <!-- 定义组件模板 -->
+  <template id="tmpl">
+    <div>
+      <h1>这是 Account 组件</h1>
+      <router-link to="/account/login">登录</router-link>
+      <router-link to="/account/register">注册</router-link>
+      <router-view></router-view>
+    </div>
+  </template>
+  <script>
+    // 创建组件模板对象
+    var account = {
+      template: '#tmpl'
+    }
+    var login = {
+      template: '<h3>登录</h3>'
+    }
+    var register = {
+      template: '<h3>注册</h3>'
+    }
+
+    // 创建路由规则
+    var router = new VueRouter({
+      routes: [
+        {
+          path: '/account',
+          component: account,
+          // 使用children属性实现子路由,同时子路由的path前面不要带/,否则永远以根路径开始请求;
+          children: [
+            { path: 'login', component: login },
+            { path: 'register', component: register }
+          ]
+        }
+      ]
+    })
+    var vm = new Vue({
+      el: '#app',
+      router 
+    });
+  </script>
+</body>
+</html>
+```
+
+```html
+使用children属性实现路由嵌套
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Document</title>
+  <script src="./vue.js"></script>
+  <script src="./vue-router-3.0.1.js"></script>
+</head>
+<body>
+   <div id="app">
+      <router-link to="/account">Account</router-link>
+      <router-view></router-view>
+   </div>
+   <script>
+      // 父路由中的组件
+      const account = Vue.extend({
+         template: `<div>
+            这是account组件
+            <router-link to="/account/login">login</router-link> | 
+            <router-link to="/account/register">register</router-link>
+            <router-view></router-view>
+         </div>`
+      });
+
+      // 子路由中的组件
+      const login = Vue.extend({
+         template: '<div>登录组件</div>'
+      });
+      const register = Vue.extend({
+         template: '<div>注册组件</div>'
+      });
+
+      // 路由实例
+      var router = new VueRouter({
+         routes: [
+            { path: '/', redirect: '/account/login' }, // 使用redirect实现路由重定向
+            {
+               path: '/account',
+               component: account,
+               children: [ // 通过 children 数组属性,来实现路由的嵌套
+                  { path: 'login', component: login }, // 注意,子路由的开头位置,不要加 / 路径符
+                  { path: 'register', component: register }
+               ]
+            }
+         ]
+      });
+      var vm = new Vue({
+         el: '#app',
+         components: {
+            account
+         },
+         router: router
+      });
+   </script>
+</body>
+</html>
+```
+
+```html
+7.监视路由地址的改变
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Document</title>
+  <script src="./vue.js"></script>
+  <script src="./vue-router-3.0.1.js"></script>
+</head>
+<body>
+  <div id="app">
+    <router-link to="/login">登录</router-link>
+    <router-link to="/register">注册</router-link>
+    <router-view></router-view>
+  </div>
+  <script>
+    var login = {
+      template: '<h3>这是登录子组件,这个组件是 奔波霸 开发的。</h3>'
+    }
+    var register = {
+      template: '<h3>这是注册子组件,这个组件是 霸波奔 开发的。</h3>'
+    }
+    var router = new VueRouter({
+      routes: [ 
+        { path: '/', redirect: '/login' },
+        { path: '/login', component: login },
+        { path: '/register', component: register }
+      ],
+      linkActiveClass: 'myactive' 
+    })
+    var vm = new Vue({
+      el: '#app',
+      router,
+      watch: {
+        // 路由地址 $route.path
+        '$route.path': function (newVal, oldVal) {
+          if (newVal === '/login') {
+            console.log('欢迎进入登录页面')
+          } else if (newVal === '/register') {
+            console.log('欢迎进入注册页面')
+          }
+        }
+      }
+    })
+  </script>
+</body>
+</html>
+```
+
+```html
+vue头部路由切换效果
+router.js
+import Header from './components/Header.vue'
+import Footer from './components/Footer.vue'
+routes: [
+    {path: '/',component: Header},
+    {path: '/header', component: Header},
+    {path: '/footer', component: Footer}
+]
+---
+App.vue
+<router-link v-for="item in lists" :key="item.url" :to="item.url">
+    <div :class="flag === item.url ? 'selected' : ''">
+    	{{ item.name }}
+    </div>
+</router-link>
+<router-view></router-view>
+---------------------------
+<script>
+export default {
+  data() {
+    return {
+      lists: [
+        {
+          url: '/header',
+          name: '头组件'
+        },
+        {
+          url: '/footer',
+          name: '尾组件'
+        }
+      ],
+      flag: ''
+    }
+  },
+  watch: {	//监听,什么在变化？当我们点击的时候路由地址url在变化！
+    '$route.fullPath': function(newVal) { //获取变化了的新的url地址 === newVal
+      console.log(newVal)
+      this.flag = newVal //讲值赋予 flag
+    }
+  }
+}
+</script>
+-----------------------------------------
+<style style="scss" scoped>
+  .selected{
+    background-color: red;
+    width: 200px;
+    height: 200px;
+  }
+</style>
+```
+
+
+
+
+
+
+
+
+
+
+

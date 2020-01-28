@@ -1,0 +1,831 @@
+# 概述
+
+- 框架保持了`UI`和状态同步
+
+- 有别于将`UI`一部分创建于结构、行为里那样可读性差，状态改变还需手动更新视图层代码的脆弱问题
+
+- 视图的添加和删除由框架完成，只需管理好数据和状态即可
+
+- 声明式渲染：采用模板语法来声明式地将数据渲染进`DOM`的系统
+
+```
+提供双向数据绑定: 只需关心业务逻辑,不用关心DOM是如何渲染的了 
+核心库只关注视图层,便于与第三方库或既有项目整合,易于上手 
+减少不必要的DOM操作,提高了渲染效率 
+解耦了视图和数据,提供了可复用的组件、前端路由技术、状态管理以及虚拟DOM等
+```
+
+- `MVVM`是前端视图层概念，将视图层分为：`Model`、`View`、`ViewModel`
+  - 其中`VM`是核心，是调度者，提供了双向数据绑定功能
+
+- `IE8`及以下版本不支持`Vue`
+
+- `vue create` + 项目名
+
+
+
+# 生命周期
+
+`Vue`实例从创建、运行、到销毁期间，总是伴随着各种各样的事件，这些事件统称为生命周期，也叫组件从运行到销毁期间的4个钩子函数。
+
+作用：有时我们需要知道`Vue`实例目前已经进行到哪一步了，因为某些操作只在对应时间点去执行，才有意义。当`Vue`执行完对应事件后，会返回给实例一个钩子函数，供给调用。
+
+**创建期间**：
+
+- `beforeCreate`：实例刚在内存中被创建出来
+- `created`：`data`和`methods`初始化完毕 
+  - 异步请求的调用
+- `beforeMount`：完成模板编译
+- `mounted`：将编译好的模板挂载到了页面指定容器中显示出来 
+  - 获取`DOM`节点
+
+**运行期间**：
+
+- `beforeUpdate`：此时`data`中的状态值是最新的，但界面上显示的数据是旧的，没有开始重新渲染`DOM`
+- `updated`：`data`中的状态值和界面上显示的数据已经实现了更新，界面渲染完毕 
+  - 对数据统一处理，在这里写上相应函数
+
+**销毁期间**：
+
+- `beforeDestroy`：实例销毁之前调用，此处实例依旧可用 
+- `destroyed`：实例指示的所有东西都会解绑，所有事件监听器移除，子实例被销毁
+
+
+
+# 指令
+
+```
+{{}}
+v-text
+v-html
+v-pre 不交给vue去解析目标代码块
+v-once
+v-cloak
+v-bind
+v-on
+v-if 直接删除元素
+v-else-if
+v-else
+v-show 给目标元素行内样式添加了display: none;属性
+v-for
+v-model
+```
+
+```html
+<p v-if="flag">{{ msg }}</p>
+<span v-else></span>
+data: {
+	flag: true,
+	msg: 'sxw'
+}
+```
+
+```html
+<p>{{ result }}</p>
+computed: {
+	result() {
+        let showMessage = ''
+        if(this.score >= 90) {
+        	showMessage = '优秀'
+        }else if(this.score >= 70) {
+        	showMessage = '良好'
+        }else if(this.score >= 60) {
+        	showMessage = '及格'
+        }else {
+        	showMessage = '不及格'
+        }
+        return showMessage
+	}
+}
+```
+
+```html
+<!-- 登录方式切换 -->
+<body>
+   <div id="app">
+      <span v-if="flag">
+         <!-- label中的for属性和input中的id属性相对应,点击聚焦 -->
+         <label for="userName">用户账号</label>
+         <input id="userName" type="text" placeholder="用户账号" :key="1">
+      </span>
+      <span v-else>
+         <label for="email">用户邮箱</label>
+         <input id="email" type="text" placeholder="用户邮箱" :key="2" />
+      </span>
+      <button @click="flag = !flag">切换</button>
+   </div>
+   <script>
+      const app = new Vue({
+         el: '#app',
+         data: {
+            flag: true  
+         }
+      })
+   </script>
+</body>
+```
+
+==问题==：当用户往`input`中输入内容后，切换模式，发现原先输入框中的内容依旧存在。
+
+==辨析==：`Vue`在进行`DOM`渲染的时候，出于性能考略，会尽可能地复用已经存在的元素，而不是重新渲染新元素。
+
+==原理==：上述案例，`Vue`内部会发现原来的`input`元素已经不再使用了，通过`diff`算法发现即将要渲染的`DOM`元素与之前的`input`相似，`Vue`就直接将其再次渲染并作为`else`中的`input`来使用。`Vue`在渲染元素的时候，并不会直接渲染到页面上。而是先将元素渲染进虚拟`dom`中，放入内存中，再将虚拟`dom`中的内容渲染到页面。所以上述两种可能并不会同时渲染到页面中去。在虚拟`dom`进行渲染的时候，会先看看自己内存中有没有，而不会在虚拟`dom`中重新创建出一份来。将原先的那些东西往我们的界面上进行渲染，然后你会发现我们现在在用的依旧是我们之前在页面中使用的`label`、`input`。但在渲染页面的时候，虚拟`dom`还会进行一个对比，将目标`DOM`中改变了属性的重新渲染，而对于渲染的多余属性（也就是我们在一种模式下`input`中输入的值）并不会进行删除操作。所以当用户输入一个`333`的时候， `<input value="333" />`中的`value`属性并不会被删除，而是直接被渲染出来了。
+
+==解决方案==：在不同的`input`后面添加一个属性`key`作为唯一标识。`key`值的不同表示我这个`input`是独一无二的。当拥有属性`key`的时候，虚拟`dom`在渲染时，就不会将其复用了。`key`值就是为了更高效的更新虚拟`dom`。
+
+```html
+模拟双向数据绑定
+<body>
+   <div id="app">
+      <input type="text" v-bind:value="message" v-on:input="valueChange" />
+      <h1>{{ message }}</h1>
+   </div>
+   <script>
+      const app = new Vue({
+         el: '#app',
+         data: {
+            message: 'sxw'
+         },
+         methods: {
+            valueChange(event) {
+               this.message = event.target.value
+            }
+         }
+      })
+   </script>
+</body>
+```
+
+```html
+<body>
+   <div id="app">
+      <input type="text" v-bind:value="message" v-on:input="message = $event.target.value" />
+      <h1>{{ message }}</h1>
+   </div>
+   <script>
+      const app = new Vue({
+         el: '#app',
+         data: {
+            message: 'sxw'
+         }
+      })
+   </script>
+</body>
+```
+
+
+
+
+
+# 样式绑定
+
+1. 动态绑定`class`属性，以对象的形式
+
+```html
+<style>
+	.color{
+		color: red;
+	}
+	.fontSize{
+		font-size: xx-large;
+	}
+</style>
+<span v-bind:class="{color: true,fontSize: true}"></span>
+```
+
+2. 动态绑定`style`属性，行内样式
+
+```html
+<span v-bind:style="{color: 'red'}"></span>
+```
+
+
+
+# 事件
+
+- 方法本身具有一个参数时，我们不给其传递参数并且省略了小括号，那么`Vue`默认会将浏览器原生事件`event`当作参数传递到方法中。
+
+```html
+<button @click="btnClick">按钮</button>
+
+btnClick(event) {
+   console.log(event)
+}
+```
+
+- 函数需要参数，但没有进行传递，那么函数的形参为`undefined`输出
+
+```html
+<button @click="btnClick()">按钮</button>
+```
+
+- 既需要`event`对象又需要进行其他参数的传递，可通过`$event`
+
+```html
+<button @click="btnClick('111', $event)">按钮</button>
+
+btnClick(a, event) {
+   console.log(a,'---',event)
+}
+```
+
+
+
+# 修饰符
+
+- `.stop`阻止所有往外的冒泡，`event.stopPropagation`
+
+```html
+<div @click="divClick">
+	aaa
+	<button @click.stop="div1Click">按钮</button>
+</div>
+```
+
+- `.prevent`阻止默认行为事件，`event.preventDefault`
+
+```html
+<form>
+	<input type="submit" value="提交" @click.prevent="submitClick">
+</form>
+```
+
+- `.enter`监听`enter`按键 `.tab`、`.delete`、`.space`、`.up`
+
+- `.once`只触发一次回调
+
+- `.self`只当事件在元素本身触发时触发回调，不让子元素事件触发自己绑定的事件，且不阻止冒泡继续
+
+- `.capture`事件捕获模式
+
+```html
+事件捕获机制: (外 ---> 内)
+	在父级绑定 .capture 实现捕获触发事件机制;
+	当我们点击按钮内事件时,会异于冒泡先触发外事件,再触发内事件,称之为捕获;
+<div class="outer" v-on:click.capture="divHandler">
+	<input type="button" value="按钮" v-on:click="btnHandler">
+</div>
+```
+
+- `.lazy`解决双向数据绑定更新速度过于频繁问题，只在敲击回车键或输入框失去焦点时，页面才重新渲染
+
+```html
+<input type="text" v-model.lazy="msg">
+```
+
+- `.number`让输入框中的内容转为数字类型进行输出
+
+```html
+<input type="number" v-model.number="age" />
+```
+
+- `.trim`过滤内容左右两边的空格 
+
+
+
+# `splice`
+
+```js
+arr = ['A','B','C']
+
+arr.splice(1) // 删除A后面所有元素
+arr.splice(1,1) // 删除A后面1个元素也就是B
+arr.splice(1,1,'D') // 从第一位后删除1位并新增1位D元素
+arr.splice(1,0,'D','E') // 从第一位后删除0位,并新增2位DE
+```
+
+
+
+# `vue`中实现了响应式的数组方法
+
+- `push`
+- `pop`
+
+
+
+- `unshift`在头部添加元素
+- `shift`
+
+
+
+- `splice`
+- `sort`
+- `reverse`
+
+
+
+## 还没实现响应式的方法
+
+通过下标修改数据。
+
+```js
+this.arr[0] = '1' // 数据改变,界面没有渲染,因为vue没有监听到
+```
+
+
+
+# 练习
+
+```html
+<style>
+  .active{
+     color: red;
+  }
+</style>
+<body>
+   <div id="app">
+      <ul>
+         <!-- 点击哪个li哪个li变红 -->
+         <li 
+            v-for="(item,index) in movies" 
+            :key="item + index"
+            :class="{active: aimIndex === index}"
+            @click="liClick(index)">{{ item }}</li>
+      </ul>
+   </div>
+   <script>
+      const app = new Vue({
+         el: '#app',
+         data: {
+            movies: ['绿皮书','了不起的盖茨比','楚门的世界'],
+            aimIndex: 0 // 第一个li变红
+         },
+         methods: {
+            liClick(index) {
+               this.aimIndex = index
+            }
+         }
+      })
+   </script>
+</body>
+```
+
+```html
+<style>
+  tabel{
+     border: 1px solid #e9e9e9;
+     border-collapse: collapse;
+     border-spacing: 0;
+  }
+  th, td{
+     padding: 8px 16px;
+     border: 1px solid #e9e9e9;
+     text-align: left;
+  }
+  th{
+     background-color: #f7f7f7;
+     color: #5c6b77;
+     font-weight: 600;
+  }
+</style>
+<body>
+   <div id="app">
+      <div v-if="books.length">
+         <table>
+            <thead>
+               <tr>
+                  <th></th>
+                  <th>书籍名称</th>
+                  <th>出版日期</th>
+                  <th>价格</th>
+                  <th>购买数量</th>
+                  <th>操作</th>
+               </tr>
+            </thead>
+            <tbody>
+               <tr v-for="(item,index) in books">
+                  <td>{{ item.id }}</td>
+                  <td>{{ item.name }}</td>
+                  <td>{{ item.date }}</td>
+                  <!-- <td>{{ getFinalPrice(item.price) }}</td> -->
+                  <td>{{ item.price | showPrice }}</td>
+                  <td>
+                     <button @click="decrement(index)" :disabled="item.count <= 1">-</button>
+                     {{ item.count }}
+                     <button @click="increment(index)">+</button>
+                  </td>
+                  <td><button @click="removeHandle(index)">移除</button></td>
+               </tr>
+            </tbody>
+         </table>
+         <h2>总价格：{{ totalPrice | showPrice }}</h2>
+      </div>
+      <h2 v-else>购物车为空</h2>
+   </div>
+   <script>
+      const app = new Vue({
+         el: '#app',
+         data: {
+            books: [
+               {
+                  id: 1,
+                  name: '《算法1》',
+                  date: '2019-1',
+                  price: 12.00,
+                  count: 1
+               },
+               {
+                  id: 2,
+                  name: '《算法2》',
+                  date: '2019-2',
+                  price: 22.00,
+                  count: 1
+               },
+               {
+                  id: 3,
+                  name: '《算法3》',
+                  date: '2019-3',
+                  price: 32.00,
+                  count: 1
+               },
+               {
+                  id: 4,
+                  name: '《算法4》',
+                  date: '2019-4',
+                  price: 42.00,
+                  count: 1
+               }
+            ]
+         },
+         methods: {
+            // 方式1.处理我们要呈现出来的价格
+            getFinalPrice(price) {
+               // .toFixed(2) 保留两位小数
+               return '￥' + price.toFixed(2)
+            },
+            increment(index) {
+               this.books[index].count ++
+            },
+            decrement(index) {
+               this.books[index].count --
+            },
+            removeHandle(index) {
+               this.books.splice(index, 1)
+            }
+         },
+         computed: {
+            totalPrice() {
+               // 以下是计算价格的4种方法！
+                
+               // 1.普通的for循环
+               // let totalPrice = 0
+               // for(let i = 0;i < this.books.length;i ++) {
+               //    totalPrice += this.books[i].price * this.books[i].count
+               // }
+               // return totalPrice;
+
+               // 2.for-in 拿到每项的索引值
+               // let totalPrice = 0
+               // for(let i in this.books) {
+               //    // console.log(i) 拿到的i是索引值
+               //    totalPrice += this.books[i].price * this.books[i].count
+               // }
+               // return totalPrice;
+
+               // 3.for-of 拿到数组中的每一项
+               // let totalPrice = 0
+               // for(let item of this.books) {
+               //    totalPrice += item.price * item.count
+               // }
+               // return totalPrice
+
+               // 4.高阶函数 reduce
+               return this.books.reduce(function(preValue, book) {
+                  return preValue + book.price * book.count
+               }, 0)
+            }
+         },
+         // 方式2.使用过滤器处理价格
+         filters: {
+            showPrice(price) {
+               return '￥' + price.toFixed(2)
+            }
+         }
+      })
+   </script>
+</body>
+```
+
+
+
+# 过滤器
+
+`{{ name | nameope }}`，输出`name`之前，先调用`nameope`进行过滤处理，将最终结果进行渲染。
+
+```html
+<body>
+   <div id="app">
+      {{ msg | msgFormat }}
+   </div>
+   <script>
+   	  // 全局过滤器
+   	  // 通过回调函数拿到需要处理的值 
+      Vue.filter('msgFormat', function(msg) {
+         return msg.replace('再见','我替换了')
+      })
+      var vm = new Vue({
+         el: '#app',
+         data: {
+            msg: '再见青春,再见信仰,再见梦想'
+         }
+      })
+   </script>
+</body>
+```
+
+```html
+正则替换
+<body>
+   <div id="app">
+      {{ msg | msgFormat }}
+   </div>
+   <script>
+      Vue.filter('msgFormat', function(msg) {
+      	 // 使用正则替换所有
+         return msg.replace(/再见/g,'我替换了')
+      })
+      var vm = new Vue({
+         el: '#app',
+         data: {
+            msg: '再见青春,再见信仰,再见梦想'
+         }
+      })
+   </script>
+</body>
+```
+
+```html
+传递参数
+<body>
+   <div id="app">
+   	  // 给过滤器传参
+      {{ msg | msgFormat('sxw') }}
+   </div>
+   <script>
+   	  // 回调函数第二个参数接收传递过来的实现替换的参数
+      Vue.filter('msgFormat', function(msg, arg) { 
+         return msg.replace(/再见/g,arg)
+      })
+      var vm = new Vue({
+         el: '#app',
+         data: {
+            msg: '再见青春,再见信仰,再见梦想'
+         }
+      })
+   </script>
+</body>
+```
+
+```html
+连续调用
+<body>
+   <div id="app">
+      {{ msg | msgFormat('sxw') | test }}
+   </div>
+   <script>
+      Vue.filter('msgFormat', function(msg, arg) {
+         return msg.replace(/再见/g,arg)
+      })
+      Vue.filter('test', function(msg) {
+         return msg + '连续第二次调用过滤器'
+      })
+      var vm = new Vue({
+         el: '#app',
+         data: {
+            msg: '再见青春,再见信仰,再见梦想'
+         }
+      })
+   </script>
+</body>
+```
+
+```html
+定义私有过滤器
+<body>
+   <div id="app">
+      <h3>{{ dt | dateFormat }}</h3>
+   </div>
+   <script>
+      var vm = new Vue({
+         el: '#app',
+         data: {
+            dt: new Date()
+         },
+         filters: {
+            // 过滤器调用的顺序,如果私有过滤器和全局过滤器名称一致,优先调用私有过滤器;
+            // 在参数列表中,通过 pattern="" 来指定形参默认值,防止报错
+            dateFormat: function(dt,pattern='') {
+               var y = dt.getFullYear()
+               var m = dt.getMonth() + 1
+               var d = dt.getDate()
+               // 如果传进来的字符串类型转为小写之后等于 yyyy-mm-dd,那么就返回 年-月-日
+               // 否则返回 年-月-日 时:分:秒
+               if(pattern && pattern.toLowerCase() === 'yyyy-mm-dd') {
+                  return `${y}-${m}-${d}` // 使用模板字符串输出,提高可读性
+               }else {
+                  var hh = dt.getHours()
+                  var mm = dt.getMinutes()
+                  var ss = dt.getSeconds()
+                  return `${y}-${m}-${d} ${hh}:${mm}:${ss}`
+               }
+            }
+         }
+      })
+   </script>
+</body>
+```
+
+
+
+# `watch`、`computed`、`methods`
+
+- `computed`结果会被==缓存==，除非依赖的响应式属性变化，才会重新计算结果
+  - 主要作为属性进行使用，只能书写==同步==操作，即数据发生变化之后自动监听响应式反应
+  - 计算属性会将数据进行缓存处理，当下次渲染的时候，会先比较当前渲染的数据与过往之间有没有发生变化，没有变化则直接从缓存中拿取数据，不会再次执行对应计算属性中的方法，优化了性能
+  - 计算属性的`set`和`get`，一般忽略`set`方法
+- `watch`键是需要观察的表达式，值是对应的回调函数
+  - 可看作是`computed`和`methods`的结合体，不需要==返回值==，可直接书写逻辑操作，支持==异步==。
+- `methods`只要页面上的数据发生变化，对应函数都会被执行，用以确保此时渲染的数据是最新的，耗费性能。
+
+```html
+<div id="app">
+    <button v-on:click="increase">加1</button>
+    <button v-on:click="decrease">减1</button>
+    <p>{{ count }}</p>
+    <p>{{ outPut }}</p>
+    <p>{{ result }}</p>
+</div>
+<script>
+ var vue = new Vue({
+    el: '#app',
+    data: {
+       count: 0
+    },
+    computed: {
+       outPut: function() {
+          return this.count > 3 ? "大于3" : "小于3"
+       }
+    },
+    watch: {
+       count: function(val) { //第一个参数表示当前数据的最新值
+          console.log(val);
+          var vm = this;
+          window.setTimeout(function() {
+             vm.count = 0;
+          },2000)
+       }
+    },
+    methods: {
+       result: function() {
+          return this.count > 3 ? "大于3" : "小于3"
+       },
+       increase: function() {
+          this.count ++;
+       },
+       decrease: function() {
+          this.count --;
+       }
+    }
+ })
+</script>
+```
+
+```html
+<body>
+  <div id="app">
+    <input type="text" v-model="firstname"> +
+    <input type="text" v-model="lastname"> =
+    <input type="text" v-model="fullname">
+  </div>
+  <script>
+    var vm = new Vue({
+      el: '#app',
+      data: {
+        firstname: '',
+        lastname: '',
+        fullname: ''
+      },
+      watch: { // 监视data中指定数据的变化,然后触发对应的处理函数
+        'firstname': function (newVal) {
+          // console.log(newVal + ' --- ' + oldVal)
+          this.fullname = newVal + '-' + this.lastname
+        },
+        'lastname': function (newVal) {
+          this.fullname = this.firstname + '-' + newVal
+        }
+      }
+    })
+  </script>
+</body>
+```
+
+```html
+<body>
+  <div id="app">
+    <input type="text" v-model="firstname"> +
+    <input type="text" v-model="middlename"> +
+    <input type="text" v-model="lastname"> =
+    <input type="text" v-model="fullname">
+    <p>{{ fullname }}</p>
+  </div>
+  <script>
+    var vm = new Vue({
+      el: '#app',
+      data: {
+        firstname: '',
+        lastname: '',
+        middlename: ''
+      },
+      computed: {
+        'fullname': function () {
+          return this.firstname + '-' + this.middlename + '-' + this.lastname
+        }
+      }
+    });
+  </script>
+</body>
+```
+
+
+
+# 禁用按钮
+
+```html
+<button :disabled="!isAgree">下一步</button>
+```
+
+
+
+# 自定义全局指令
+
+## 行为
+
+```html
+<body>
+   <div id="app">
+      <input type="text" v-focus>
+   </div>
+   <script>
+      Vue.directive('focus', {
+         // 每个函数的第一个参数都是el,是一个原生js对象,表示被绑定指令的目标元素
+         // 当元素插入dom中执行inserted函数,获得焦点,且只触发一次
+         inserted: function(el) {
+            el.focus()
+         }
+      })
+      const app = new Vue({
+         el: '#app'
+      })
+   </script>
+</body>
+```
+
+## 样式
+
+```html
+<body>
+   <div id="app">
+      <input type="text" v-model="keyworlds" v-color="'red'"><br>
+      {{ keyworlds }}
+   </div>
+   <script>
+      Vue.directive('color', {
+         // 和样式相关的都在bind里面设置
+         // 只要通过指令绑定给了目标元素,不论元素有没有被插入到页面中,肯定会存在一个内联样式。将来元素也会显示在页面中,浏览器的渲染引擎也会解析样式应用给这个元素
+         bind(el,binding) {
+            console.log(binding.name); // color
+            console.log(binding.value); // red
+            el.style.color = binding.value
+         }
+      })
+      const app = new Vue({
+         el: '#app',
+         data: {
+            keyworlds: 'sxw'
+         }
+      })
+   </script>
+</body>
+```
+
+
+
+# 自定义私有指令
+
+```html
+<body>
+   <div id="app">
+      <span v-fontweight="900">sxw</span>
+   </div>
+   <script>
+      const app = new Vue({
+         el: '#app',
+         directives: {
+            fontweight(el,binding) {
+               el.style.fontWeight = binding.value;
+            }
+         }
+      })
+   </script>
+</body>
+```
