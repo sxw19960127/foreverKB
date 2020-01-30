@@ -4,21 +4,25 @@
 vue create mini_cinema
 ```
 
+
+
 ## 安装依赖
 
 - `Babel`
 - `CSS Pre-processors`
 - `Sass/SCSS (with dart-sass)`
 
+
+
 ## 初始化项目
 
-将脚手架搭建的项目中不需要的部分进行删除，初始化项目。
+将脚手架搭建项目中不需要的部分进行删除，初始化项目。
 
 ```js
 // main.js - 项目入口模块
 
 import Vue from 'vue'
-import App from './App' // 导入根组件
+import App from './App'
 
 Vue.config.productionTip = false
 
@@ -32,7 +36,7 @@ new Vue({
 // App.vue - 根组件
 
 <template>
-  <div>这是根组件</div>
+  <div>根组件</div>
 </template>
 ```
 
@@ -42,11 +46,11 @@ new Vue({
 
 ## 一级路由设计
 
-![路由设计](C:\Users\lenovo\Desktop\5天背诵\mini_cinema项目需求\img\路由设计.jpg)
+![路由设计](C:\Users\lenovo\Desktop\5天背诵\17.mini_cinema项目需求\img\路由设计.jpg)
 
 先设计最底下的电影、影院、我的三大路由展示页组件，结构如下：
 
-![底部三个大路由](C:\Users\lenovo\Desktop\5天背诵\mini_cinema项目需求\img\底部三个大路由.jpg)
+![底部三个大路由](C:\Users\lenovo\Desktop\5天背诵\17.mini_cinema项目需求\img\底部三个大路由.jpg)
 
 ```shell
 // 路由下载
@@ -58,14 +62,14 @@ npm install vue-router --save
 ```js
 // 路由入口模块
 
-import VueRouter from 'vue-router' // 导入路由
-import Vue from 'vue' // 导入vue,路由依赖于vue
+import VueRouter from 'vue-router' 
+import Vue from 'vue' 
 
-const Movie = () => import('@/views/Movie') // 使用懒加载,导入子组件
+const Movie = () => import('@/views/Movie') 
 const Cinema = () => import('@/views/Cinema')
 const Mine = () => import('@/views/Mine')
 
-Vue.use(VueRouter) // 使用中间介注册路由
+Vue.use(VueRouter) 
 
 const router = new VueRouter({ // 实例化一个路由
     routes: [
@@ -76,11 +80,11 @@ const router = new VueRouter({ // 实例化一个路由
     mode: 'history'
 })
 
-export default router // 导出router,引入的时候注意一下
+export default router
 ```
 
 ```js
-// main.js - 项目入口模块中导入并注册路由
+// main.js
 
 import router from './router' // 导入
 new Vue({
@@ -101,7 +105,7 @@ new Vue({
 </template>
 ```
 
-完成上述路由设计之后，我们通过手动更改`url`以验证路由是否设计成功！
+完成上述路由设计后，通过手动更改`url`以验证路由是否设计成功！
 
 
 
@@ -121,7 +125,7 @@ git push ck dev
 
 
 
-# 移动端的适配
+# 移动端适配
 
 ```html
 <meta name="viewport" content="width=device-width,initial-scale=1.0,user-scalable=no">
@@ -150,7 +154,7 @@ const router = new VueRouter({
 
 
 
-# 将静态资源放入public文件夹下
+# 将静态资源放入`public`文件夹下
 
 在`public`文件夹下，新建一个`css`文件夹，用以存放静态样式文件。
 
@@ -165,7 +169,7 @@ const router = new VueRouter({
 
 
 
-# 创建头部和尾部组件
+# 创建公共头部和底部组件
 
  ```vue
 // 头部组件
@@ -196,7 +200,6 @@ export default {
          text-align: center;
          line-height: 50px;
       }
-      // 这里还有一个i样式没有暂时没有写入
    }
 </style>
  ```
@@ -262,25 +265,27 @@ export default {
 </style>
 ```
 
-## 在Movie页面中引入上述两个组件
+
+
+## 在`Movie`页面引入上述两个组件
 
 ```vue
 <template>
   <div id="main">
-    <!-- 使用组件 -->
+    <!-- 3.使用 -->
     <Header />
     <TabBar />
   </div>
 </template>
 
 <script>
-// 引入头部、底部组件
+// 1.引入
 import Header from '@/components/Header'
 import TabBar from '@/components/TabBar'
 export default {
   name: 'Movie',
   components: {
-    // 注册局部组件
+    // 2.注册
     Header,
     TabBar
   }
@@ -296,7 +301,7 @@ export default {
 
 # 缓存处理
 
-在`App.vue`中，我们使用`<keep-alive>`将路由展示给包裹起来，这样在进行路由切换的时候，就会有缓存的效果。
+在`App.vue`中，使用`<keep-alive>`将路由展示给包裹起来，这样在进行路由切换的时候，实现缓存效果。
 
 ```vue
 <template>
@@ -309,7 +314,7 @@ export default {
 
 
 
-# router-link实现页面路由切换
+# `router-link`实现页面路由切换
 
 ```vue
  <router-link tag="li" to="/movie">
@@ -317,6 +322,8 @@ export default {
     <p>电影</p>
  </router-link>
 ```
+
+
 
 ## 当前选中路由的高亮设置
 
@@ -328,18 +335,16 @@ export default {
 
 
 
-# 同样在cinema和mine页面也引入以上两个组件
-
-引入，注册，使用。
+# 同样在`cinema`和`mine`页面也引入上述两个组件
 
 
 
-# 切换路由时实现头部标题的切换
+# 切换路由时实现头部标题切换
 
-在我们的头部组件中，标题是写死的，我们需要在调用头部组件的时候，实现父子通信，将标题写成一个动态信息
+在头部组件中，标题是写死的，我们需要在调用头部组件的时候，实现父子通信，将标题写成一个动态信息。
 
 ```js
-// 头部组件中通过props字段,结构部分渲染title字段
+// 头部组件中通过props字段
 export default {
    name: 'Header',
    props: {
@@ -351,13 +356,13 @@ export default {
 }
 ```
 
-回到`cinema`和`mine`组件中，将`title`字段值传递出去：
+回到`cinema`和`mine`组件，将`title`字段值传递出去：
 
 ```vue
 <template>
   <div id="main">
     <!-- 通过在Header标签头部添加上一个 title 属性,进行传值 -->
-    <Header title="电影院" />
+    <Header title="电影院" /> <!-- 这里为啥不用属性绑定的形式??? -->
     <TabBar />
   </div>
 </template>
@@ -379,13 +384,13 @@ export default {
 
 # 二级路由切换
 
- ![二级路由](C:\Users\lenovo\Desktop\5天背诵\mini_cinema项目需求\img\二级路由.jpg)
+ ![二级路由](C:\Users\lenovo\Desktop\5天背诵\17.mini_cinema项目需求\img\二级路由.jpg)
 
-在`components`组件文件夹中，新建4个二级子路由，分别是`City`、`NowPlaying`、`ComingSoon`、`Search`
+在`components`文件夹中，新建4个二级子路由，分别是`City`、`NowPlaying`、`ComingSoon`、`Search`
 
-## 配置路由
 
-通过`children`字段进行配置。
+
+## 配置二级路由
 
 ```js
 const router = new VueRouter({  
@@ -400,11 +405,13 @@ const router = new VueRouter({
         },
   		{path: '/cinema',component: Cinema},
         {path: '/mine',component: Mine},
-        {path: '/*',redirect: '/movie'} // 路由重定向,上述路由都不匹配的情况下
+        {path: '/*',redirect: '/movie'} // 路由重定向
     ],
     mode: 'history'
 })
 ```
+
+
 
 ## 将内容结构写入组件中
 
@@ -413,10 +420,9 @@ const router = new VueRouter({
 ```vue
 <template>
   <div id="main">
-    <!-- 使用组件 -->
-
     <!-- 头部 -->
     <Header />
+      
     <!-- 二级路由切换部分 -->
     <div id="content">
       <div class="movie_menu">
@@ -432,6 +438,7 @@ const router = new VueRouter({
           <i class="iconfont icon-sousuo"></i>
         </div>
       </div>
+        
       <!-- 二级路由展示区 -->
       <keep-alive>
         <router-view></router-view>
@@ -444,19 +451,21 @@ const router = new VueRouter({
 </template>
 ```
 
-## 编辑二级路由内容的结构
 
-总共有4个二级页面，这四个页面是位于`movie`一级路由下的，分别是：
+
+## 编辑二级路由内容结构
+
+4个二级页面，这四个页面是位于`movie`一级路由下的，分别是：
 
 - `City`
 - `NowPlaying`
 - `ComingSoon`
 - `Search`
 
-  ![二级路由切换](C:\Users\lenovo\Desktop\5天背诵\mini_cinema项目需求\img\二级路由切换.jpg)
+  ![二级路由切换](C:\Users\lenovo\Desktop\5天背诵\17.mini_cinema项目需求\img\二级路由切换.jpg)
 
 ```vue
-<!-- 二级路由切换部分 -->
+<!-- 二级路由切换部分,在一级路由电影页进行编辑 -->
 <div id="content">
   <div class="movie_menu">
     <router-link tag="div" to="/movie/city" class="city_name">
@@ -471,6 +480,7 @@ const router = new VueRouter({
       <i class="iconfont icon-sousuo"></i>
     </router-link>
   </div>
+    
   <!-- 二级路由展示区 -->
   <keep-alive>
     <router-view></router-view>
@@ -478,7 +488,7 @@ const router = new VueRouter({
 </div>
 ```
 
-使用`router-link`进行路由的跳转。
+
 
 ## 选中的二级组件高亮显示
 
@@ -488,6 +498,8 @@ const router = new VueRouter({
   border-bottom: 2px solid #ef4238;
 }
 ```
+
+
 
 ## 重定向二级路由
 
@@ -505,7 +517,7 @@ const router = new VueRouter({
         },
   		{path: '/cinema',component: Cinema},
         {path: '/mine',component: Mine},
-        {path: '/*',redirect: '/movie'} // 路由重定向,上述路由都不匹配的情况下
+        {path: '/*',redirect: '/movie'}
     ],
     mode: 'history'
 })
@@ -515,11 +527,13 @@ const router = new VueRouter({
 
 # 完成影院和我的一级路由组件内容
 
-![影院](C:\Users\lenovo\Desktop\5天背诵\mini_cinema项目需求\img\影院.jpg)
+![影院](C:\Users\lenovo\Desktop\5天背诵\17.mini_cinema项目需求\img\影院.jpg)
 
 创建两个组件`CiList`和`Login`。
 
-## 回到Cinema一级路由组件
+
+
+## 回到`Cinema`一级路由组件
 
 完善结构。
 
@@ -552,6 +566,8 @@ git branch -d createComponents // 删除分支
 git checkout -b setData // 创建一个新分支
 ```
 
+
+
 ## 接口文档
 
 ```
@@ -577,9 +593,11 @@ http://39.97.33.178/api/cinemaList?cityId=10
 http://39.97.33.178/api/getLocation
 ```
 
+
+
 ## 反向代理解决跨域问题
 
-让脚手架能够代理到数据，在脚手架中新建一个`vue.config.js`文件，用以配置相关的环境，内容如下：
+让脚手架能够代理到数据，在脚手架中新建一个`vue.config.js`文件，用以配置相关环境：
 
 ```js
 module.exports = {
@@ -599,6 +617,28 @@ module.exports = {
 ```shell
 npm install axios --save
 ```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+看到这里！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！
 
 ## `city`一级路由中获取真实数据
 
@@ -702,7 +742,7 @@ export default {
 }
 ```
 
-![城市数据](C:\Users\lenovo\Desktop\5天背诵\mini_cinema项目需求\img\城市数据.jpg)
+![城市数据](C:\Users\lenovo\Desktop\5天背诵\17.mini_cinema项目需求\img\城市数据.jpg)
 
 ## 将真实数据渲染到页面上
 
@@ -756,7 +796,7 @@ export default {
 
 ## 点击右侧字母改变滚动条位置
 
-![城市渲染完毕图](C:\Users\lenovo\Desktop\5天背诵\mini_cinema项目需求\img\城市渲染完毕图.jpg)
+![城市渲染完毕图](C:\Users\lenovo\Desktop\5天背诵\17.mini_cinema项目需求\img\城市渲染完毕图.jpg)
 
 通过移动端触摸事件`touchstart`事件。
 
@@ -954,7 +994,7 @@ watch: {
 }
 ```
 
-![函数防抖](C:\Users\lenovo\Desktop\5天背诵\mini_cinema项目需求\img\函数防抖.jpg)
+![函数防抖](C:\Users\lenovo\Desktop\5天背诵\17.mini_cinema项目需求\img\函数防抖.jpg)
 
 
 
@@ -1747,7 +1787,7 @@ mounted() {
 }
 ```
 
-![本地存储](C:\Users\lenovo\Desktop\5天背诵\mini_cinema项目需求\img\本地存储.jpg)
+![本地存储](C:\Users\lenovo\Desktop\5天背诵\17.mini_cinema项目需求\img\本地存储.jpg)
 
 ## 状态管理
 
@@ -1825,7 +1865,7 @@ export default {
 <span>{{ $store.state.city.nm }}</span>
 ```
 
-![vuex](C:\Users\lenovo\Desktop\5天背诵\mini_cinema项目需求\img\vuex.jpg)
+![vuex](C:\Users\lenovo\Desktop\5天背诵\17.mini_cinema项目需求\img\vuex.jpg)
 
 ## 修改状态管理中的nm和id
 
@@ -1876,7 +1916,7 @@ const state = {
 
 
 
-![vuex状态管理](C:\Users\lenovo\Desktop\5天背诵\mini_cinema项目需求\img\vuex状态管理.jpg)
+![vuex状态管理](C:\Users\lenovo\Desktop\5天背诵\17.mini_cinema项目需求\img\vuex状态管理.jpg)
 
 
 
@@ -2031,7 +2071,7 @@ export default {
 }
 ```
 
-![弹窗组件](C:\Users\lenovo\Desktop\5天背诵\mini_cinema项目需求\img\弹窗组件.jpg)
+![弹窗组件](C:\Users\lenovo\Desktop\5天背诵\17.mini_cinema项目需求\img\弹窗组件.jpg)
 
 ```js
 // 上述的弹窗组件模板代码,如下:
@@ -2333,7 +2373,7 @@ export default {
 
 ## 命名视图处理路由问题
 
-![命名视图](C:\Users\lenovo\Desktop\5天背诵\mini_cinema项目需求\img\命名视图.jpg)
+![命名视图](C:\Users\lenovo\Desktop\5天背诵\17.mini_cinema项目需求\img\命名视图.jpg)
 
 我们需要在`Movie`页，点击具体电影，跳出详情页：
 
@@ -2540,7 +2580,7 @@ const router = new VueRouter({
 })
 ```
 
-![base路由设置](C:\Users\lenovo\Desktop\5天背诵\mini_cinema项目需求\img\base路由设置.jpg)
+![base路由设置](C:\Users\lenovo\Desktop\5天背诵\17.mini_cinema项目需求\img\base路由设置.jpg)
 
 ## 关于静态资源的路径
 
