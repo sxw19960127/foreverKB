@@ -620,41 +620,20 @@ npm install axios --save
 
 
 
+## `city`二级路由页面获取真实数据
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-看到这里！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！
-
-## `city`一级路由中获取真实数据
-
-我们先获取入口函数模块`main.js`中，引用加载`axios`：
+先在入口函数模块`main.js`中，引用加载`axios`：
 
 ```js
-// vue是面向对象的程序,vue就是一个类,我们可以对其添加一些方法
+// vue是面向对象编程,vue就是一个类,我们可以对其添加一些方法
 import axios from 'axios'
 Vue.prototype.axios = axios // 这样完成添加之后,我们就可以通过this.axios来使用了
 ```
 
-`vue`中我们都是在`mounted`生命周期中去获取我们的数据的：
+在`mounted`生命周期中去获取数据：
 
 ```js
-// 在City页面
-
+// City页面
 export default {
    name: 'City',
    data() {
@@ -665,17 +644,19 @@ export default {
       }
    },
    mounted() {
-      // 发起网络请求,请求数据
-      this.axios.get('/api/cityList').then((res) => {
+      // 发起网络请求
+      this.axios.get('/api/cityList').then(res => {
          // console.log(res)
          let msg = res.data.msg
          if(msg === 'ok') {
-            // 获取到的所有数据
+            // 获取到所有数据
             let cities = res.data.data.cities 
+            
             // [ { index: 'A',list: [{ name: '安徽',id: 1 },{ name: '埃及',id: 2 } ]} ] 将数据整理成这种结构
-            // 封装一个函数,将原始数据传递进去,以达到格式化的效果
+            // 封装函数,将原始数据传递进去,以达到格式化效果
             var { cityList,hotList } = this.formatCityList(cities) // 对象的解构赋值
-            this.cityList = cityList; // 将数据进行存储
+            
+            this.cityList = cityList; // 将数据保存在自己data上
             this.hotList = hotList;
          }
       })
@@ -696,9 +677,10 @@ export default {
          for(var i = 0;i < cities.length;i ++) {
             // 截取第一个英文字母并转换为大写形式
             var firstLetter = cities[i].py.substring(0,1).toUpperCase()
-            if(toCom(firstLetter)) { // 新添加index
+            
+            if(toCom(firstLetter)) { // 是新添加的index
                cityList.push({ index: firstLetter,list: [{ nm: cities[i].nm, id: cities[i].id }]})
-            }else { // 累加到已有index索引中
+            }else { // 累加到已有index索引中list数组里
                for(var j = 0;j < cityList.length;j ++) {
                   if(cityList[j].index === firstLetter) {
                      cityList[j].list.push({ nm: cities[i].nm, id: cities[i].id })
@@ -706,6 +688,7 @@ export default {
                }
             }
          }
+          
 		 // 仅判断是否有相同数据存在
          function toCom(firstLetter) {
             for(var i = 0;i < cityList.length;i ++) {
@@ -729,8 +712,8 @@ export default {
             }
          })
 
-         console.log(cityList)
-         console.log(hotList)
+         // console.log(cityList)
+         // console.log(hotList)
           
          // 将最终数据return出去
          return {
@@ -743,6 +726,8 @@ export default {
 ```
 
 ![城市数据](C:\Users\lenovo\Desktop\5天背诵\17.mini_cinema项目需求\img\城市数据.jpg)
+
+
 
 ## 将真实数据渲染到页面上
 
@@ -794,11 +779,13 @@ export default {
 </div>
 ```
 
+
+
 ## 点击右侧字母改变滚动条位置
 
 ![城市渲染完毕图](C:\Users\lenovo\Desktop\5天背诵\17.mini_cinema项目需求\img\城市渲染完毕图.jpg)
 
-通过移动端触摸事件`touchstart`事件。
+移动端触摸事件`touchstart`事件
 
 ```vue
 <div class="city_index">
@@ -832,14 +819,14 @@ methods: {
 	handleToIndex(index) {
 		var h2 = this.$refs.city_sort.getElementsByTagName('h2') 
 		// 找到h2的DOM元素的父元素,并将对应点击的目标元素距离顶部距离赋值给父元素
-		this.$refs.city_sort.parentNode.scrollTop = h2[index].offsetTop
+		this.$refs.city_sort.parentNode.scrollTop = h2[index].offsetTop  ****
 	}
 }
 ```
 
 
 
-# 完成正在热映和即将上映二级页面的数据
+# 完成正在热映和即将上映二级页面数据
 
 ```
 正在热映 - 接口文档
@@ -865,11 +852,14 @@ export default {
 }
 ```
 
+
+
 ## 使用过滤器设置图片大小
 
 ```js
 // 在入口模块main.js中
 // 过滤url中,replace其w.h,替换为arg
+
 Vue.filter('setWH',(url,arg) => {
     return url.replace(/w\.h/,arg)
 })
@@ -900,7 +890,7 @@ Vue.filter('setWH',(url,arg) => {
 
 # 搜索页面数据的渲染
 
-数据的渲染是当我们在输入框中输入内容之后，才检索出数据的，所以数据的请求不是和之前一样在`mouted`里面进行了。
+数据的渲染是当我们在输入框中输入内容之后，才检索出数据的，所以数据请求不是和之前一样在`mouted`里。
 
 给`input`输入框添加双向数据绑定指令，用以获取到输入的值。
 
@@ -932,6 +922,8 @@ export default {
 ```
 
 ```html
+<input type="text" v-model="message">
+
 <li v-for="item in moviesList" :key="item.id">
    <div class="img">
       <img :src="item.img | setWH('128.180')">
@@ -948,12 +940,14 @@ export default {
 </li>
 ```
 
+
+
 ## 函数防抖
 
 当我们在上述输入框中频繁地输入多次内容的时候，`watch`就会触发多次。而我们所希望的是，当我们快速输入内容的时候，并不希望其发起请求，而当我们输入内容完毕之后，才发起请求。
 
 - 方法1，使用`clearTimeout()`和`setTimeout()`每次发起请求的时候都会清除上次发起请求，已达到效果
-- 方法2，使用`axios`终止多次请求
+- 方法2，使用`axios`终止多次请求   ***
 
 ```js
 methods: {
@@ -965,13 +959,12 @@ methods: {
   }
 },
 watch: {
-  // 我们需要去监听message字段,所以下面只需要写上就能够监听到message数据的改变了
   message(newValue) {
      // 2
      var that = this;
      // 3
      this.cancelRequest();
-     this.axios.get('/api/searchList?cityId=10&kw=' + newValue,{ // 4,再添加一个参数
+     this.axios.get('/api/searchList?cityId=10&kw=' + newValue,{ // 4.再添加一个参数
         cancelToken: new this.axios.CancelToken(function(c) {
            that.source = c;
         })
@@ -1000,7 +993,7 @@ watch: {
 
 # 影院页面数据的渲染
 
-接口没有，所以还是使用假数据写死页面。
+接口没有
 
 ```html
 <li v-for="item in cinemaList" :key="item.id">
@@ -1056,6 +1049,8 @@ export default {
    }
 }
 ```
+
+
 
 ## 局部过滤器实现标签颜色变化
 
@@ -1113,13 +1108,13 @@ export default {
 
 
 
-# 提交阶段代码到git
+# 提交阶段代码到`git`
 
 ```shell
-git status // 查看修改的内容
+git status 
 git add .
 git commit -m "..."
-git checkout dev // 切换到开发分支上
+git checkout dev // 切换到开发分支
 git merge setData --no-ff // 将setData合并到开发分支dev上
 :q // 需要我们填写注释,不想写的话就退出
 git log // 查看日志
@@ -1158,6 +1153,8 @@ git checkout -b getCity
 同样的第三方插件也为我们提供了：`iscroll`、`swiper`、`better-scroll`。
 
 所以我们决定使用`better-scroll`去使用在我们的项目中。
+
+
 
 ### `better-scroll`
 
@@ -1230,6 +1227,8 @@ methods: {
 ```
 
 ---
+
+
 
 ### 下拉刷新
 
@@ -1305,10 +1304,12 @@ data() {
 <li>{{ pullDownMessage }}</li>
 ```
 
-## 封装better-scroll组件
+
+
+## 封装`better-scroll`组件
 
 ```vue
-// better-scroll组件 将其注册成为全局组件
+// better-scroll组件,将其注册为全局组件
 
 <template>
   <div class="wrapper" ref="wrapper">
@@ -1337,17 +1338,19 @@ export default {
 ```
 
 ```js
-// main.js 入口模块中注册全局组件 scroller
+// main.js 入口模块中注册成为全局组件scroller
 
 import Scroller from '@/components/Scoller'
 Vue.component('Scroller', Scroller);
 ```
 
+
+
 **组件中使用**：
 
 ```html
 1.使用标签<Scroller>将滚动区域包裹起来
-// 注册全局组件完成之后,只需将上下滚动内容部分用<Scroller>标签包裹起来即可
+2.注册全局组件完成之后,只需将上下滚动内容部分用<Scroller>标签包裹起来即可
 <Scroller>
  <ul>
    <!-- <li v-for="(item,index) in 10" :key="item + index">
@@ -1442,6 +1445,8 @@ export default {
 }
 ```
 
+
+
 ### 关于正在更新和更新完成，使用父子通信去实现
 
 ```js
@@ -1515,6 +1520,8 @@ methods: {
 <Scroller :handleToScroll = "handleToScroll" :handleToTouchEnd = "handleToTouchEnd"></Scroller>
 ```
 
+
+
 ### better-scroller中的点击跳转配置
 
 **设置**：
@@ -1547,6 +1554,8 @@ methods: {
 }
 ```
 
+
+
 **使用**：
 
 ```html
@@ -1564,11 +1573,11 @@ handleToIndex(index) {
 
 
 
-# 封装loading组件
+# 封装`loading`组件
 
 我们采用的是`CSS3`去做一个`loading`的动画实现，不要使用图片，因为图片本身也是需要发起请求的。
 
-新建一个`loading`组件
+新建一个`loading`组件。
 
 [loading动画网址](https://www.runoob.com/w3cnote/free-html5-css3-loaders-preloaders.html)
 
@@ -1769,7 +1778,7 @@ mounted() {
      this.axios.get('/api/cityList').then((res) => {
         let msg = res.data.msg
         if(msg === 'ok') {
-           // 0.获取到的所有数据
+           // 0.获取到所有数据
            let cities = res.data.data.cities 
            var { cityList,hotList } = this.formatCityList(cities)
            this.cityList = cityList;
@@ -1788,6 +1797,24 @@ mounted() {
 ```
 
 ![本地存储](C:\Users\lenovo\Desktop\5天背诵\17.mini_cinema项目需求\img\本地存储.jpg)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 ## 状态管理
 
@@ -1867,7 +1894,9 @@ export default {
 
 ![vuex](C:\Users\lenovo\Desktop\5天背诵\17.mini_cinema项目需求\img\vuex.jpg)
 
-## 修改状态管理中的nm和id
+
+
+## 修改状态管理中的`nm`和`id`
 
 通过添加点击操作，分别给热门城市和分类中的`li`条件点击事件，并将`nm`和`id`传递过去：
 
@@ -1943,6 +1972,8 @@ activated() {
   })
 }
 ```
+
+
 
 ## 需求：当且仅当我们从城市组件切换到正在热映组件的时候，需要重新发起网络请求数据，否则直接走缓存
 
@@ -2201,6 +2232,8 @@ mounted() {
 }
 ```
 
+
+
 ## 传递阶段代码到git
 
 ```shell
@@ -2371,6 +2404,8 @@ export default {
 </header>
 ```
 
+
+
 ## 命名视图处理路由问题
 
 ![命名视图](C:\Users\lenovo\Desktop\5天背诵\17.mini_cinema项目需求\img\命名视图.jpg)
@@ -2399,6 +2434,8 @@ export default {
     ]
 },
 ```
+
+
 
 ## 给详情页后退图标添加点击事件
 
@@ -2462,6 +2499,8 @@ methods: {
 
 以上便是完成了详情页的跳转和返回操作。
 
+
+
 ## 最后将传递过来的详情页根据id进行网络请求拿到数据
 
 因为我们使用的是命名视图去实现动态路由，所以使用字段`props`去实现：
@@ -2489,6 +2528,8 @@ export default {
     }
 }
 ```
+
+
 
 ## 当我们在详情页点击回退图标的时候，希望有一个动画效果
 
@@ -2528,6 +2569,8 @@ export default {
 ```
 
 如果有多个页面都是需要使用上述动画的，那么我们就将其再多写一份路由配置一下。
+
+
 
  ## 提交到git 
 
@@ -2582,6 +2625,8 @@ const router = new VueRouter({
 
 ![base路由设置](C:\Users\lenovo\Desktop\5天背诵\17.mini_cinema项目需求\img\base路由设置.jpg)
 
+
+
 ## 关于静态资源的路径
 
 回到`vue.config.js`中，添加`publicPath`字段：
@@ -2601,6 +2646,8 @@ module.exports = {
     }
 }
 ```
+
+
 
 ## 打包
 
