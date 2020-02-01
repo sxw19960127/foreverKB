@@ -1,3 +1,8 @@
+```
+普通会员 iu 1996
+管理员 admin 123
+```
+
 # 服务端
 
 ## 全局安装`express`脚手架
@@ -701,77 +706,684 @@ export default {
 </template>
 ```
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+## 实现登录状态组件
+
+回到`Login`文件夹中的`index.vue`文件中：
+
+```js
+export default {
+   name: 'Login',
+   data() {
+      return {
+         username: '', // 定义用户的用户名和密码为空
+         password: ''
+      }
+   }
+} 
+```
+
+```html
+<!-- 使用v-model开启双向数据绑定 -->
+<input class="login_text" v-model="username" type="text" placeHolder="账户名" >
+<input class="login_text" v-model="password" type="password" placeHolder="密码" >
+```
+
+```html
+<!-- 给登录按钮添加点击事件 -->
+<input type="submit" value="登录" @touchstart="handleToLogin">
+```
+
+去`vue.config.js`中去代理一下我们的接口，因为我们要进行数据请求了。
+
+```js
+// 反向代理我们的接口
+proxy: {
+    '/api2': { // 代理本地的接口要放在比较上面一点
+        target: 'http://localhost:3000',
+        changeOrigin: true
+    },
+    '/api': {
+       target: 'http://39.97.33.178',
+       changeOrigin: true
+    }
+}    
+```
+
+重启服务，让反向代理生效。
+
+```js
+// 给登录按钮点击事件发送axios请求
+methods: {
+  handleToLogin() { 
+     this.axios.post('/api2/users/login', {
+        username: this.username,
+        password: this.password
+     }).then((res) => {
+        console.log(res)
+     })
+  }
+}
+```
+
+我们切换到`/login`地址来进行测试一下我们的反向代理是否成功！
+
+![登录测试](C:\Users\lenovo\Desktop\5天背诵\17.mini_cinema项目需求\img_server\登录测试.jpg)
+
+当我们换成正确的账号和密码之后就会显示成功登录了。
+
+![登录成功](C:\Users\lenovo\Desktop\5天背诵\17.mini_cinema项目需求\img_server\登录成功.jpg)
+
+好了，登录成功之后要给用户一个提示信息，我们之前有做过一个`MessageBox`文件，我们可以使用那个！
+
+```js
+import { messageBox } from '@/components/JS' // 引入弹窗
+
+methods: {
+  handleToLogin() {
+     this.axios.post('/api2/users/login', {
+        username: this.username,
+        password: this.password
+     }).then((res) => {
+        // console.log(res)
+        var status = res.data.status
+        if(status === 0) {
+           messageBox({
+              title: '登录',
+              content: '登录成功',
+              ok: '确定'
+           })
+        }else {
+           messageBox({
+              title: '登录',
+              content: '登录失败',
+              ok: '确定'
+           })
+        }
+     })
+  }
+}
+```
+
+优化弹窗，加上`v-if`条件判断，美化界面样式：
+
+```js
+优化1：在 JS > MessageBox > index.vue中
+
+<span v-if="cancel" @touchstart="handleCancel">{{ cancel }}</span>
+<span v-if="ok" @touchstart="handleOk">{{ ok }}</span>
+```
+
+```js
+优化2：来到 JS > index.js 中
+
+// 给我们定制的模板一些默认参数
+var default1 = {
+  title: '',
+  content: '',
+  cancel: '',
+  ok: '',
+  handleCancel: null,
+  handleOk: null
+}
+var MyComponent = Vue.extend(MessageBox)
+
+将上述代码放到后续return 代码块中,原因类似vue组件中为什么data是一个方法并且要返回一个对象是一样的。
+```
+
+![当我们输入错误的账号密码的时候](C:\Users\lenovo\Desktop\5天背诵\17.mini_cinema项目需求\img_server\当我们输入错误的账号密码的时候.jpg)
+
+当我们登录成功之后，要使用`this.$router.push`跳转到个人中心页面：
+
+```js
+// 注意两个点: 1.this指向问题;2.$router.push使用
+methods: {
+  handleToLogin() {
+     this.axios.post('/api2/users/login', {
+        username: this.username,
+        password: this.password
+     }).then((res) => {
+        var status = res.data.status
+        var This = this // 保存一下this指向
+        if(status === 0) {
+           messageBox({
+              title: '登录',
+              content: '登录成功',
+              ok: '确定',
+              handleOk() {
+                 This.$router.push('/mine/center')
+              }
+           })
+        }else {
+           messageBox({
+              title: '登录',
+              content: '登录失败',
+              ok: '确定'
+           })
+        }
+     })
+  }
+}
+```
+
+当我们输入正确的用户名和密码之后就会跳转到用户中心页面。图片我就不放了，自行补脑。
+
+以上，登录页面就已经完成了。
+
+## 用户中心页面
+
+我们先来做一下用户中心的退出功能。
+
+来到`Mine` > `center.vue`中，点击退出按钮，对应事件发起`axios`请求：
+
+```html
+<template>
+  <div>
+     个人中心：<a href="javascript:;" @touchstart="handleToLogin">退出</a>
+  </div>
+</template>
+
+<script>
+export default {
+   name: 'center',
+   methods: {
+      handleToLogin() {
+         this.axios.get('/api2/users/logout').then(res => {
+            var status = res.data.status
+            if(status === 0) {
+               this.$router.push('/mine/login')
+            }
+         })
+      }
+   }
+}
+</script>
+
+<style>
+
+</style>
+```
+
+以上就是退出页面。
+
+## 使用路由守卫去监听用户状态
+
+处理当用户没有登录的时候点击我的的时候，是会跳转到注册页面的；但是当用户注册完成之后，从别的页面跳转到我的页面的时候，是直接显示`center`页面的，你有没有想到应该怎么去处理？
+
+因为我们仅仅是组件之间的状态判断，所以我们使用组件内的路由守卫。
+
+来到个人中心`center.vue`页面，添加前置守卫：
+
+```js
+// 需要注意两点:
+// 1.为什么还要进一步导入aixos,之前我们不是已经将其挂载到Vue原型链上去了么？这是因为路由守卫中明确提出我们在路由内部是拿不到this指向的，所以我们需要再次引入axios，已确保我们此时拿到的this是正确的
+// 2.路由守卫的使用
+
+import axios from 'axios'
+export default {
+   name: 'center',
+   methods: {
+      handleToLogin() {
+         this.axios.get('/api2/users/logout').then(res => {
+            var status = res.data.status
+            if(status === 0) {
+               this.$router.push('/mine/login')
+            }
+         })
+      }
+   },
+   beforeRouteEnter(to, from, next) {
+      axios.get('/api2/users/getUser').then(res => {
+         var status = res.data.status
+         if(status === 0) {
+            next()
+         }else {
+            next('/mine/login')
+         }
+      })
+   }
+}
+```
+
+接着需要获取到当前登录用户，并且把数据渲染到页面上。
+
+```html
+<template>
+  <div>
+     <div>个人中心：</div>
+     <div>当前用户：<a href="javascript:;" @touchstart="handleToLogin">退出</a></div>
+  </div>
+</template>
+```
+
+因为获取到的用户信息可能不仅仅在一个页面上会使用到，所以我们将其存到`vuex`中：
+
+在`stores`中创建一个文件夹`user`，里面再新建一个`index.vue`文件：
+
+```js
+const state = {
+   name: ''
+};
+
+const actions = {
+
+};
+
+const mutations = {
+   USER_NAME(state,payload) {
+      state.name = payload.name
+   }
+}
+
+export default {
+   namespaced: true,
+   state,
+   actions,
+   mutations
+}
+```
+
+去`stores`文件夹中的入口状态管理`index.js`中去注册一下。
+
+```js
+import user from './user' // 1.引入
+modules: {
+  city,
+  user // 2.注册
+}
+```
+
+然后回到我们的个人中心`center`页面进行个人状态管理就可以了：
+
+```js
+beforeRouteEnter(to, from, next) {
+  axios.get('/api2/users/getUser').then(res => {
+     var status = res.data.status
+     if(status === 0) {
+        next(vm => { // 官网说可以通过 vm 访问到组件实例
+           vm.$store.commit('user/USER_NAME', { name: res.data.data.username }) // 第一个参数就是名字，第二个参数就是接口中写好的返回的数据
+        })
+     }else {
+        next('/mine/login')
+     }
+  })
+}
+```
+
+通过上述代码的设置就成功把我们的数据存到状态管理里面了。
+
+![数据存储](C:\Users\lenovo\Desktop\5天背诵\17.mini_cinema项目需求\img_server\数据存储.jpg)
+
+以上我们就可以发现在`vue-devtools`里面，我们可以发现数据从无到有的变化过程了。
+
+那么我们就可以在个人中心页面进行用户信息的渲染了：
+
+```html
+<div>当前用户：{{ $store.state.user.name }} <a href="javascript:;" @touchstart="handleToLogin">退出</a></div>
+```
+
+细节优化：当我们退出的时候，在`center`页面置空用户名
+
+```js
+methods: {
+  handleToLogin() {
+     this.axios.get('/api2/users/logout').then(res => {
+        var status = res.data.status
+        if(status === 0) {
+           this.$store.commit('user/USER_NAME', {name: ''}) // 1.当我们退出的时候,将用户名置空
+           this.$router.push('/mine/login')
+        }
+     })
+  }
+},
+```
+
+![退出置空数据](C:\Users\lenovo\Desktop\5天背诵\17.mini_cinema项目需求\img_server\退出置空数据.jpg)
+
+以上就是所有登录以及用户状态的信息。
+
+## 注册和找回密码
+
+来到`Login`文件夹下的`index.vue`文件中：
+
+```html
+<div class="login_link">
+	<router-link to="/mine/register">立即注册</router-link>
+	<router-link to="/mine/findPassword">找回密码</router-link>
+</div>
+```
+
+来到`Register`文件夹下的`index.vue`文件，来完成注册页的开发：确认密码部分
+
+```html
+<template>
+  <div class="register_body">
+    <div class="register_email">
+      邮箱：<input v-model="email" class="register_text" type="text"> <button>发送验证码</button>
+    </div>
+    <div>
+      用户名：<input v-model="username" class="register_text" type="text">
+    </div>
+    <div>
+      密码：<input v-model="password" class="register_text" type="password">
+    </div>
+    <div>
+      确认密码：<input class="register_text" type="password"> <!-- 此功能不开发 -->
+    </div>
+    <div>
+      验证码：<input v-model="verify" class="register_text" type="text">
+    </div>
+    <div class="register_btn">
+      <button>注册</button>
+    </div>
+    <div class="register_link">
+      <router-link to="/mine/login">立即登录</router-link>
+      <router-link to="/mine/findPassword">找回密码</router-link>
+    </div>
+  </div>
+</template>
+
+<script>
+export default {
+   name: 'register',
+   data() { // 双向数据绑定
+     return {
+       email: '',
+       username: '',
+       password: '',
+       verify: ''
+     }
+   }
+}
+</script>
+
+<style lang="scss" scoped>
+   .register_body{  
+      .register_email{
+        position: relative;
+        button{
+          position: absolute;
+          right: 10px;
+          top: 10px;
+          height: 30px;
+        }
+      }
+      width: 100%;
+      .register_text{ 
+         width: 100%; 
+         height: 40px; 
+         border: none; 
+         border-bottom: 1px solid #ccc; 
+         margin-bottom: 5px; 
+         outline: none; 
+         text-indent: 10px;
+      }
+      .register_btn{ 
+         height: 50px; 
+         margin: 10px;
+         button{
+            width: 100%; 
+            height: 100%; 
+            background-color: #e54847; 
+            border-radius: 3px; 
+            border: none; 
+            display: block; 
+            color: white; 
+            font-size: 20px;
+         }
+      }
+      .register_link{ 
+         display: flex; 
+         justify-content: space-between;
+         a{ 
+            text-decoration: none; 
+            margin: 0 5px; 
+            font-size: 12px; 
+            color:#e54847;
+         }
+      }
+   }
+</style>
+```
+
+给注册按钮绑定点击事件：
+
+```html
+<div class="register_btn">
+	<button @touchstart="handleToRegister">注册</button>
+</div>
+
+<button @touchstart="handleToVerify">发送验证码</button>
+```
+
+**验证码部分**：
+
+```js
+import { messageBox } from "@/components/JS"; // 导入信息提示弹窗
+
+handleToVerify() {
+  this.axios.get("/api2/users/verify?email=" + this.email).then(res => {
+    var status = res.data.status;
+    if (status === 0) {
+      // 验证码发送成功,需要导入messageBox组件来做一个提示用户作用
+      messageBox({
+        title: "验证码",
+        content: "验证码发送成功",
+        ok: "确定"
+      });
+    } else {
+      messageBox({
+        title: '验证码',
+        content: '验证码发送失败',
+        ok: '确定'
+      });
+    }
+  });
+},
+```
+
+![验证码部分](C:\Users\lenovo\Desktop\5天背诵\17.mini_cinema项目需求\img_server\验证码部分.jpg)
+
+**注册**：
+
+```js
+handleToRegister() {
+  this.axios
+    .post("/api2/users/register", {
+      email: this.email,
+      username: this.username,
+      password: this.password,
+      verify: this.verify
+    })
+    .then(res => {
+      var status = res.data.status;
+      var This = this // 1.为路由跳转做准备
+      if (status === 0) {
+        messageBox({
+          title: "注册",
+          content: "用户注册成功",
+          ok: "确定",
+          handleOk() {
+            This.$router.push('/mine/login') // 2.当注册成功之后就往注册页跳转
+          }
+        });
+      } else {
+        messageBox({
+          title: "注册",
+          content: res.data.msg + "，请重新注册", // 3.把失败的原因显示出来给用户
+          ok: "确定"
+        });
+      }
+    });
+}
+```
+
+**修改密码**：
+
+来到`FindPassword`文件夹中的`index.vue`文件：
+
+```html
+<template>
+  <div class="password_body">
+    <div class="password_email">
+      邮箱：<input class="password_text" type="text"> <button>发送验证码</button>
+    </div>
+    <div>
+      新密码：<input class="password_text" type="password">
+    </div>
+    <div>
+      验证码：<input class="password_text" type="text">
+    </div>
+    <div class="password_btn">
+      <button>修改</button>
+    </div>
+    <div class="password_link">
+      <router-link to="/mine/login">立即登录</router-link>
+      <router-link to="/mine/register">立即注册</router-link>
+    </div>
+  </div>
+</template>
+
+<script>
+export default {
+   name: 'findPassWord'
+}
+</script>
+
+<style lang="scss" scoped>
+.password_body {
+  .password_email {
+    position: relative;
+    button {
+      position: absolute;
+      right: 10px;
+      top: 10px;
+      height: 30px;
+    }
+  }
+  width: 100%;
+  .password_text {
+    width: 100%;
+    height: 40px;
+    border: none;
+    border-bottom: 1px solid #ccc;
+    margin-bottom: 5px;
+    outline: none;
+    text-indent: 10px;
+  }
+  .password_btn {
+    height: 50px;
+    margin: 10px;
+    button {
+      width: 100%;
+      height: 100%;
+      background-color: #e54847;
+      border-radius: 3px;
+      border: none;
+      display: block;
+      color: white;
+      font-size: 20px;
+    }
+  }
+  .password_link {
+    display: flex;
+    justify-content: space-between;
+    a {
+      text-decoration: none;
+      margin: 0 5px;
+      font-size: 12px;
+      color: #e54847;
+    }
+  }
+}
+</style>
+```
+
+以上便是基本的样式文件。
+
+添加点击事件：
+
+```html
+<button @touchstart="handleToVerify">发送验证码</button>
+<button @touchstart="handleToPassword">修改</button>
+```
+
+```js
+// 定义数据
+data() {
+    return {
+      email: '',
+      password: '',
+      verify: ''
+    }
+}
+
+// 双向数据绑定到view上
+<input class="password_text" v-model="email" type="text" />
+<input class="password_text" v-model="password" type="password" />
+<input class="password_text" v-model="verify" type="text" />
+```
+
+**找回密码**：
+
+```js
+// 功能
+// 发起验证码和注册是一样的接口,所以可以共用代码
+// 修改密码和注册密码是通用的
+handleToVerify() {
+  // 验证码功能
+  this.axios.get("/api2/users/verify?email=" + this.email).then(res => {
+    var status = res.data.status;
+    if (status === 0) {
+      // 验证码发送成功,需要导入messageBox组件来做一个提示用户作用
+      messageBox({
+        title: "验证码",
+        content: "验证码发送成功",
+        ok: "确定"
+      });
+    } else {
+      messageBox({
+        title: "验证码",
+        content: "验证码发送失败",
+        ok: "确定"
+      });
+    }
+  });
+}
+```
+
+**修改密码**：
+
+```js
+import { messageBox } from "@/components/JS"; // 导入信息提示弹窗
+
+handleToPassword() {
+  this.axios.post('/api2/users/findPassword', {
+    email: this.email,
+    password: this,password,
+    verify: this.verify
+  }).then(res => {
+    var status = res.data.status;
+    var This = this
+    if(status === 0) {
+      messageBox({
+        title: '修改',
+        content: '修改密码成功',
+        ok: '确定',
+        handleOk() {
+          This.$router.push('/mine/login');
+        }
+      })
+    }else {
+      messageBox({
+        title: '修改',
+        content: '修改密码失败',
+        ok: '确定'
+      })
+    }
+  })
+}
+```
+
+![修改密码1](C:\Users\lenovo\Desktop\5天背诵\17.mini_cinema项目需求\img_server\修改密码1.jpg)
+
+至此所有的页面组件都完成了。
