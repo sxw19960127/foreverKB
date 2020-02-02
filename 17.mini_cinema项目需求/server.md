@@ -3,7 +3,7 @@
 管理员 admin 123
 ```
 
-# 服务端
+# 1.服务端
 
 ## 全局安装`express`脚手架
 
@@ -11,14 +11,14 @@
 npm install express-generator -g
 ```
 
-## 快速构建项目
+## 快速创建项目
 
 ```shell
 express -e miniserver
 ```
 
 ```shell
-cd miniserver // 进项目
+cd miniserver 
 npm install // 下载脚手架所依赖的包
 ```
 
@@ -599,7 +599,7 @@ var findPassword = async (req,res,next)=>{
 
 
 
-# 实现前台的功能
+# 2.实现前台功能
 
 来到`Mine`文件夹下的`index.vue`文件中：
 

@@ -1,10 +1,8 @@
-# 脚手架创建项目
+# 1.脚手架初始化项目
 
 ```shell
-vue create mini_cinema
+vue create name
 ```
-
-
 
 ## 安装依赖
 
@@ -12,15 +10,12 @@ vue create mini_cinema
 - `CSS Pre-processors`
 - `Sass/SCSS (with dart-sass)`
 
-
-
 ## 初始化项目
 
-将脚手架搭建项目中不需要的部分进行删除，初始化项目。
+将脚手架搭建出来的项目中不需要的部分进行删除，初始化项目。
 
 ```js
-// main.js - 项目入口模块
-
+// main.js 项目入口模块
 import Vue from 'vue'
 import App from './App'
 
@@ -33,8 +28,7 @@ new Vue({
 ```
 
 ```vue
-// App.vue - 根组件
-
+<!-- App.vue 根组件 -->
 <template>
   <div>根组件</div>
 </template>
@@ -42,7 +36,7 @@ new Vue({
 
 
 
-# 项目开发流程
+# 2.项目开发流程
 
 ## 一级路由设计
 
@@ -53,16 +47,14 @@ new Vue({
 ![底部三个大路由](C:\Users\lenovo\Desktop\5天背诵\17.mini_cinema项目需求\img\底部三个大路由.jpg)
 
 ```shell
-// 路由下载
+路由下载
 npm install vue-router --save
 ```
 
-在`src`开发文件下新建`router`文件夹，里面再新建一个`index.js`路由入口模块。
+在`src`下新建`router`文件夹，里面再新建`index.js`路由入口模块：
 
 ```js
-// 路由入口模块
-
-import VueRouter from 'vue-router' 
+import VueRouter from 'vue-router'
 import Vue from 'vue' 
 
 const Movie = () => import('@/views/Movie') 
@@ -71,7 +63,7 @@ const Mine = () => import('@/views/Mine')
 
 Vue.use(VueRouter) 
 
-const router = new VueRouter({ // 实例化一个路由
+const router = new VueRouter({ // 实例化路由
     routes: [
     	{path: '/movie',component: Movie},
   		{path: '/cinema',component: Cinema},
@@ -84,60 +76,59 @@ export default router
 ```
 
 ```js
-// main.js
+// main.js 项目入口模块
 
-import router from './router' // 导入
+import router from './router' // 1.导入
 new Vue({
    el: '#app',
-   router, // 注册
+   router, // 2.注册
    render: h => h(App)
 })
 ```
 
 ```vue
-// 回到App.vue根组件中,放置用以展示路由内容的坑
+<!-- 回到App.vue根组件,放置用以展示一级路由的坑 -->
 
 <template>
   <div>
-    这是根组件
+    根组件
     <router-view />  
   </div>
 </template>
 ```
 
-完成上述路由设计后，通过手动更改`url`以验证路由是否设计成功！
+路由设计后通过手动更改`url`以验证路由是否配置成功！
 
 
 
-# `git`管理项目
+# 3.`git`管理项目
 
 ## 创建分支
 
 ```shell
-创建并且连接到分支dev上
-git checkout -b dev
+git checkout -b dev 创建并且连接到分支dev
 ```
 
 ```shell
-将第一阶段的代码push到开发分支dev上
 git push ck dev
 ```
 
 
 
-# 移动端适配
+# 4.移动端适配
 
 ```html
+<!-- 不允许用户拖放设置 user-scalable -->
 <meta name="viewport" content="width=device-width,initial-scale=1.0,user-scalable=no">
 ```
 
 
 
-# 资源请求的路径
+# 5.配置资源请求路径
 
 ```html
-<!-- 在index.html中的href属性中 <%= BASE_URL %> ,和路由中的base字段相对应 -->
-<link rel="icon" href="<%= BASE_URL %>favicon.ico">
+<!-- 在index.html中的href属性 <%= BASE_URL %> 和路由中的base字段相对应 -->
+<link rel="icon" href="<%= BASE_URL %>favicon.ico"> // 1.
 ```
 
 ```js
@@ -148,31 +139,31 @@ const router = new VueRouter({
   		{path: '/mine',component: Mine}
     ],
     mode: 'history',
-    base: process.env.BASE_URL
+    base: process.env.BASE_URL // 2.
 })
 ```
 
 
 
-# 将静态资源放入`public`文件夹下
+# 6.`public`文件夹
 
-在`public`文件夹下，新建一个`css`文件夹，用以存放静态样式文件。
+`public`文件夹下，新建一个`css`文件夹，用以存放静态样式文件。
 
-将`iconfont`图标样式和初始化项目的样式引入进去：
+将`iconfont`图标样式和初始化项目样式放进去，并在`index.html`中引入：
 
 ```html
 <link rel="stylesheet" href="<%= BASE_URL %>css/common.css">
 <link rel="stylesheet" href="<%= BASE_URL %>css/iconfont.css">
 ```
 
-打开浏览器控制台，在`network`中可以发现上述两个`css`已经全部加载成功了。
+打开浏览器控制台，在`network`中可以发现上述两个`css`已经全部加载完毕！
 
 
 
-# 创建公共头部和底部组件
+# 7.公共头部和底部组件
 
  ```vue
-// 头部组件
+// 1.头部组件
 
 <template>
    <header id="header">
@@ -182,7 +173,7 @@ const router = new VueRouter({
 
 <script>
 export default {
-   name: 'Header' // 添加上name属性之后,方便调试
+   name: 'Header' // 添加name属性后,方便调试组件
 }
 </script>
 
@@ -205,7 +196,7 @@ export default {
  ```
 
 ```vue
-// 底部一级路由切换组件
+// 2.底部组件
 
 <template>
   <footer id="footer">
@@ -265,9 +256,7 @@ export default {
 </style>
 ```
 
-
-
-## 在`Movie`页面引入上述两个组件
+## 在`Movie`页引入上述组件
 
 ```vue
 <template>
@@ -279,34 +268,28 @@ export default {
 </template>
 
 <script>
-// 1.引入
-import Header from '@/components/Header'
+import Header from '@/components/Header' // 1.引入
 import TabBar from '@/components/TabBar'
+    
 export default {
   name: 'Movie',
   components: {
-    // 2.注册
-    Header,
+    Header, // 2.注册
     TabBar
   }
 }
 </script>
-
-<style>
-
-</style>
 ```
 
 
 
-# 缓存处理
+# 8.缓存处理
 
-在`App.vue`中，使用`<keep-alive>`将路由展示给包裹起来，这样在进行路由切换的时候，实现缓存效果。
+在`App.vue`中，使用`<keep-alive>`将路由展示包裹起来，在进行路由切换时，会有缓存效果。
 
 ```vue
 <template>
   <keep-alive>
-    <!-- 这是根组件 -->
     <router-view />  
   </keep-alive>
 </template>
@@ -314,7 +297,7 @@ export default {
 
 
 
-# `router-link`实现页面路由切换
+# 9.`router-link`路由跳转
 
 ```vue
  <router-link tag="li" to="/movie">
@@ -323,9 +306,7 @@ export default {
  </router-link>
 ```
 
-
-
-## 当前选中路由的高亮设置
+## 当前路由的高亮设置
 
 ```css
 .router-link-active{
@@ -333,18 +314,16 @@ export default {
 }
 ```
 
-
-
-# 同样在`cinema`和`mine`页面也引入上述两个组件
+同样在`cinema`和`mine`页面也引入上述两个组件！
 
 
 
-# 切换路由时实现头部标题切换
+# 10.切换路由时头部标题的切换
 
-在头部组件中，标题是写死的，我们需要在调用头部组件的时候，实现父子通信，将标题写成一个动态信息。
+在头部组件中，标题是写死的，我们需要在调用头部组件的时候，实现==父子通信==，将标题写成一个动态信息。
 
 ```js
-// 头部组件中通过props字段
+// 头部组件中通过props
 export default {
    name: 'Header',
    props: {
@@ -361,8 +340,7 @@ export default {
 ```vue
 <template>
   <div id="main">
-    <!-- 通过在Header标签头部添加上一个 title 属性,进行传值 -->
-    <Header title="电影院" /> <!-- 这里为啥不用属性绑定的形式??? -->
+    <Header title="电影院" /> <!-- 这里为啥不用属性绑定的形式 ? -->
     <TabBar />
   </div>
 </template>
@@ -370,6 +348,7 @@ export default {
 <script>
 import Header from '@/components/Header'
 import TabBar from '@/components/TabBar'
+    
 export default {
   name: 'Cinema',
   components: {
@@ -382,13 +361,11 @@ export default {
 
 
 
-# 二级路由切换
+# 11.二级路由 
 
  ![二级路由](C:\Users\lenovo\Desktop\5天背诵\17.mini_cinema项目需求\img\二级路由.jpg)
 
-在`components`文件夹中，新建4个二级子路由，分别是`City`、`NowPlaying`、`ComingSoon`、`Search`
-
-
+在`components`文件夹中，新建4个二级子路由，分别是`City`、`NowPlaying`、`ComingSoon`、`Search`！
 
 ## 配置二级路由
 
@@ -411,9 +388,7 @@ const router = new VueRouter({
 })
 ```
 
-
-
-## 将内容结构写入组件中
+## 将结构写入组件
 
 `Movie`组件：
 
@@ -438,7 +413,7 @@ const router = new VueRouter({
           <i class="iconfont icon-sousuo"></i>
         </div>
       </div>
-        
+       
       <!-- 二级路由展示区 -->
       <keep-alive>
         <router-view></router-view>
@@ -451,11 +426,9 @@ const router = new VueRouter({
 </template>
 ```
 
+## 二级路由内容结构
 
-
-## 编辑二级路由内容结构
-
-4个二级页面，这四个页面是位于`movie`一级路由下的，分别是：
+4个二级页面，这四个页面位于`movie`一级路由下，分别是：
 
 - `City`
 - `NowPlaying`
@@ -465,7 +438,8 @@ const router = new VueRouter({
   ![二级路由切换](C:\Users\lenovo\Desktop\5天背诵\17.mini_cinema项目需求\img\二级路由切换.jpg)
 
 ```vue
-<!-- 二级路由切换部分,在一级路由电影页进行编辑 -->
+<!-- 使用 router-link 属性 -->
+
 <div id="content">
   <div class="movie_menu">
     <router-link tag="div" to="/movie/city" class="city_name">
@@ -480,26 +454,21 @@ const router = new VueRouter({
       <i class="iconfont icon-sousuo"></i>
     </router-link>
   </div>
-    
-  <!-- 二级路由展示区 -->
+
   <keep-alive>
     <router-view></router-view>
   </keep-alive>
 </div>
 ```
 
+## 二级路由高亮 
 
-
-## 选中的二级组件高亮显示
-
-```scss
+```css
 .router-link-active{
   color: #ef4238;
   border-bottom: 2px solid #ef4238;
 }
 ```
-
-
 
 ## 重定向二级路由
 
@@ -525,79 +494,65 @@ const router = new VueRouter({
 
 
 
-# 完成影院和我的一级路由组件内容
+# 12.影院和我的一级路由内容
 
 ![影院](C:\Users\lenovo\Desktop\5天背诵\17.mini_cinema项目需求\img\影院.jpg)
 
-创建两个组件`CiList`和`Login`。
+创建两个组件`CiList`（插入到一级路由组件`Cinema`中间部位的）和`Login`（用来插入到一级路由组件`Mine`中的中间部位的）。
 
+回到`Cinema`一级路由组件，完善结构。
 
-
-## 回到`Cinema`一级路由组件
-
-完善结构。
-
-同样的完成`Login.vue`组件，然后回到`Mine`组件页面，里面原本是有两个组件了已经，分别是头部组件和底部组件，所以我们讲新完成的组件`Login.vue`组件导入到`Mine`组件里，注册，使用。那么这个`Mine`页面组件就完成了。
+同样完成`Login.vue`组件，然后回到`Mine`一级路由组件页面，里面原本是有两个组件了已经，分别是头部组件和底部组件，所以我们将新完成的组件`Login.vue`组件导入到`Mine`组件里，注册，使用。那么这个`Mine`页面组件就完成了。
 
 至此，基本上的组件页面拆分就已经完成了。
 
 
 
-# 使用`git`管理阶段项目代码
+# 13.`git`管理阶段代码
 
 ```shell
-git status // 查看项目的修改代码
+git status // 查看代码的修改情况
 git add .
-git commit -m "" // 创建为一个版本
-git checkout dev // 切换到开发分支上
-git merge createComponents --no-ff // 参数-no-ff方便后期我们来进行查看日志
+git commit -m ""  
+git checkout dev // 切换到开发分支
+git merge createComponents --no-ff // 参数-no-ff方便后期我们查看日志
 git log // 打印日志
 
-git push ck dev // push到远程
-git branch // 查看当前有多少分支
+git push ck dev 
+git branch // 查看当前分支数
 git branch -d createComponents // 删除分支
 ```
 
  
 
-# 调接口，请求真实数据
+# 14.请求真实数据
 
 ```shell
-git checkout -b setData // 创建一个新分支
+git checkout -b setData // 创建新分支
 ```
-
-
 
 ## 接口文档
 
 ```
 正在热映
 http://39.97.33.178/api/movieOnInfoList?cityId=10
-
 即将上映
 http://39.97.33.178/api/movieComingList?cityId=10
-
 搜索
 http://39.97.33.178/api/searchList?cityId=10&kw=a
-
 城市
 http://39.97.33.178/api/cityList
-
 电影详情
 http://39.97.33.178/api/detailmovie?movieId=345808
-
 影院
 http://39.97.33.178/api/cinemaList?cityId=10
-
 城市定位
 http://39.97.33.178/api/getLocation
 ```
 
+## 反向代理解决跨域
 
-
-## 反向代理解决跨域问题
-
-让脚手架能够代理到数据，在脚手架中新建一个`vue.config.js`文件，用以配置相关环境：
+新建`vue.config.js`文件：
 
 ```js
 module.exports = {
@@ -618,19 +573,17 @@ module.exports = {
 npm install axios --save
 ```
 
+## `city`二级路由页获取数据
 
-
-## `city`二级路由页面获取真实数据
-
-先在入口函数模块`main.js`中，引用加载`axios`：
+先在入口函数模块`main.js`中，引入`axios`：
 
 ```js
-// vue是面向对象编程,vue就是一个类,我们可以对其添加一些方法
+// vue是面向对象编程,vue是一个类,我们可以对其添加一些方法
 import axios from 'axios'
-Vue.prototype.axios = axios // 这样完成添加之后,我们就可以通过this.axios来使用了
+Vue.prototype.axios = axios // 完成添加后,可以通过this.axios调用
 ```
 
-在`mounted`生命周期中去获取数据：
+在`mounted`生命周期中发起`axios`：
 
 ```js
 // City页面
@@ -727,9 +680,7 @@ export default {
 
 ![城市数据](C:\Users\lenovo\Desktop\5天背诵\17.mini_cinema项目需求\img\城市数据.jpg)
 
-
-
-## 将真实数据渲染到页面上
+## 渲染数据
 
 ```html
 <div class="city_body">
@@ -779,13 +730,11 @@ export default {
 </div>
 ```
 
-
-
 ## 点击右侧字母改变滚动条位置
 
 ![城市渲染完毕图](C:\Users\lenovo\Desktop\5天背诵\17.mini_cinema项目需求\img\城市渲染完毕图.jpg)
 
-移动端触摸事件`touchstart`事件
+移动端触摸事件`touchstart`事件！
 
 ```vue
 <div class="city_index">
@@ -807,7 +756,7 @@ methods: {
 ```
 
 ```html
- <div class="city_sort" ref="city_sort"> // 我们在最外层的div处添加一个ref属性
+ <div class="city_sort" ref="city_sort"> // 我们在最外层的div上添加一个ref属性
     <div v-for="item in cityList" :key="item.index">
        <h2>{{ item.index }}</h2> // 这里是展示左侧 A B C D...的地方
        <ul>
@@ -818,7 +767,7 @@ methods: {
 methods: {
 	handleToIndex(index) {
 		var h2 = this.$refs.city_sort.getElementsByTagName('h2') 
-		// 找到h2的DOM元素的父元素,并将对应点击的目标元素距离顶部距离赋值给父元素
+		// 找到h2的DOM元素的父元素,并将对应点击的目标元素距离顶部距离赋给父元素
 		this.$refs.city_sort.parentNode.scrollTop = h2[index].offsetTop  ****
 	}
 }
@@ -826,10 +775,10 @@ methods: {
 
 
 
-# 完成正在热映和即将上映二级页面数据
+# 15.正在热映和即将上映页面数据
 
 ```
-正在热映 - 接口文档
+正在热映
 http://39.97.33.178/api/movieOnInfoList?cityId=10
 ```
 
@@ -852,13 +801,10 @@ export default {
 }
 ```
 
-
-
-## 使用过滤器设置图片大小
+## 过滤器设置图片大小
 
 ```js
-// 在入口模块main.js中
-// 过滤url中,replace其w.h,替换为arg
+// 入口模块main.js中,过滤url,replace其w.h,替换为arg
 
 Vue.filter('setWH',(url,arg) => {
     return url.replace(/w\.h/,arg)
@@ -868,7 +814,7 @@ Vue.filter('setWH',(url,arg) => {
 ```html
  <li v-for="item in movieList" :key="item.id">
     <div class="pic_show">
-       <img :src="item.img | setWH('128.180')" alt=""> 
+       <img :src="item.img | setWH('128.180')" alt=""> // 1.宽高
     </div>
     <div class="info_list">
        <h2>{{ item.nm }} <img v-if="item.version" src="@/assets/maxs.png" alt=""></h2> 
@@ -882,17 +828,15 @@ Vue.filter('setWH',(url,arg) => {
  </li>
 ```
 
-以上就是正在热映真实数据渲染完毕。
-
-即将到来页面与正在热映差不多。
+以上就是正在热映真实数据渲染，即将到来页面与正在热映差不多。
 
 
 
-# 搜索页面数据的渲染
+# 16.搜索页面数据渲染
 
 数据的渲染是当我们在输入框中输入内容之后，才检索出数据的，所以数据请求不是和之前一样在`mouted`里。
 
-给`input`输入框添加双向数据绑定指令，用以获取到输入的值。
+- 给`input`输入框添加双向数据绑定指令，用以获取到输入的值
 
 如何根据我们输入的值去获取数据，而且`axios`是异步进行获取数据的，所以`computed`计算属性不能使用，应该使用`watch`去监听。
 
@@ -906,7 +850,7 @@ export default {
       }
    },
    watch: {
-      // 我们需要实时去监听message字段的变化,所以下面只需要写上就能够监听到
+      // 我们需要实时去监听message字段的变化
       message(newValue) {
          this.axios.get('/api/searchList?cityId=10&kw=' + newValue).then(res => {
             var msg = res.data.msg;
@@ -940,13 +884,13 @@ export default {
 </li>
 ```
 
-
-
 ## 函数防抖
 
-当我们在上述输入框中频繁地输入多次内容的时候，`watch`就会触发多次。而我们所希望的是，当我们快速输入内容的时候，并不希望其发起请求，而当我们输入内容完毕之后，才发起请求。
+当我们在上述输入框中频繁地输入内容时，`watch`就会触发多次。
 
-- 方法1，使用`clearTimeout()`和`setTimeout()`每次发起请求的时候都会清除上次发起请求，已达到效果
+我们所希望的是，当快速输入内容的时候，不发起请求，当我们输入内容完毕之后，才发起请求。
+
+- 方法1，使用`clearTimeout()`和`setTimeout()`每次发起请求的时候都会清除上次发起请求，达到效果
 - 方法2，使用`axios`终止多次请求   ***
 
 ```js
@@ -972,7 +916,6 @@ watch: {
         var msg = res.data.msg;
         var movies = res.data.data.movies;
         if(msg && movies) {
-           // 符合搜索要求的数据赋值给moviesList进行保存
            this.moviesList = res.data.data.movies.list;
         }
      }).catch(err => { // 5
@@ -991,7 +934,7 @@ watch: {
 
 
 
-# 影院页面数据的渲染
+# 17.影院页数据渲染
 
 接口没有
 
@@ -1009,7 +952,7 @@ watch: {
     </div>
     <div class="card">
        // 遍历对象也可以使用v-for指令,其中num遍历的是对象的属性名,key遍历的是对象的属性值
-       // 调用局部过滤器,将 {{key | formateCard}} key交给formateCard去处理得到最终值
+       // 调用局部过滤器,将 {{key | formateCard}} key交给formateCard去处理
        <div v-for="(num,key) in item.tag" v-if="num === 1" :key="key">{{ key | formatCard }}</div>
     </div>
  </li>
@@ -1050,8 +993,6 @@ export default {
 }
 ```
 
-
-
 ## 局部过滤器实现标签颜色变化
 
 ```css
@@ -1086,7 +1027,7 @@ export default {
                return card[i].value
             }
          }
-         return '' // 都没有匹配到,给一个默认值 '空字符串
+         return '' 
       },
       classCard(key) {
       	 var card = [
@@ -1108,7 +1049,7 @@ export default {
 
 
 
-# 提交阶段代码到`git`
+# 18.提交阶段代码到`git`
 
 ```shell
 git status 
@@ -1119,14 +1060,14 @@ git merge setData --no-ff // 将setData合并到开发分支dev上
 :q // 需要我们填写注释,不想写的话就退出
 git log // 查看日志
 ^c 退出
-git push ck dev // 提交到远端
+git push ck dev 
 git branch // 查看分支
 git branch -d setData // 删除分支
 ```
 
 
 
-# 使用`git`创建分支
+# 19.创建`git`分支
 
 ```shell
 git checkout -b getCity
@@ -1134,29 +1075,29 @@ git checkout -b getCity
 
 
 
-# 移动端遇到的两个问题
+# 20.移动端的两个问题
 
 ## 点击目标跳转到详情页
 
-当我们滑动页面的时候，不触发事件。当我们点击目标区域时，才触发事件。
+当我们滑动页面的时候，不触发事件。
+
+当我们点击目标区域时，才触发事件。
 
 ### `tap`点击事件
 
 `tap`事件的特点就是当且仅当我们点击的时候触发事件。
 
-`tap`事件在原生`js`中是不存在的，所以我们要想使用必须用`touchstart`、`touchmove`、`touchend`去模拟。
+`tap`事件在原生`js`中是不存在的，所以我们要想使用必须用`touchstart`、`touchmove`、`touchend`模拟。
 
-当然第三方插件为我们提供了：`zepto`、`vue-touch`、`better-scroll`都为我们解决了这个问题。
+当然第三方插件为我们提供了，`zepto`、`vue-touch`、`better-scroll`都为我们解决了这个问题。
 
-还有一个问题就是我们的页面在进行上下滚动的时候，非常的生硬，一点都不流畅的感觉。
+还有一个问题就是我们的页面在进行上下滚动的时候，非常的生硬，一点都不流畅。
 
 同样的第三方插件也为我们提供了：`iscroll`、`swiper`、`better-scroll`。
 
 所以我们决定使用`better-scroll`去使用在我们的项目中。
 
-
-
-### `better-scroll`
+## `better-scroll`
 
 ```shell
 npm install better-scroll --save
@@ -1228,8 +1169,6 @@ methods: {
 
 ---
 
-
-
 ### 下拉刷新
 
 通过配置`probeType`属性实现滑动截流效果。
@@ -1252,9 +1191,7 @@ mounted() {
      var msg = res.data.msg;
      if(msg === 'ok') {
         this.movieList = res.data.data.movieList;
-        // 2.$nextTick()方法能够保证我们的数据完全被渲染到页面上,并且页面已经完整呈现出来了
         this.$nextTick(() => {
-           // 3.在$nextTick()里面new BScroll方法就能成功
            var scroll = new BScroll( this.$refs.movie_body, {
               tap: true,
               probeType: 1 // = 1时,滚动的时候会派发scroll事件,会截流
@@ -1304,12 +1241,10 @@ data() {
 <li>{{ pullDownMessage }}</li>
 ```
 
-
-
-## 封装`better-scroll`组件
+## 封装`better-scroll`
 
 ```vue
-// better-scroll组件,将其注册为全局组件
+// better-scroll 将其注册为全局组件
 
 <template>
   <div class="wrapper" ref="wrapper">
@@ -1344,13 +1279,12 @@ import Scroller from '@/components/Scoller'
 Vue.component('Scroller', Scroller);
 ```
 
-
-
 **组件中使用**：
 
 ```html
 1.使用标签<Scroller>将滚动区域包裹起来
 2.注册全局组件完成之后,只需将上下滚动内容部分用<Scroller>标签包裹起来即可
+    
 <Scroller>
  <ul>
    <!-- <li v-for="(item,index) in 10" :key="item + index">
@@ -1445,9 +1379,7 @@ export default {
 }
 ```
 
-
-
-### 关于正在更新和更新完成，使用父子通信去实现
+### 关于正在更新和更新完成，使用父子通信实现
 
 ```js
 // better-scroll 组件中,通过props创建两个属性,定义两个方法,并且将两个方法回调出去给外界
@@ -1520,9 +1452,7 @@ methods: {
 <Scroller :handleToScroll = "handleToScroll" :handleToTouchEnd = "handleToTouchEnd"></Scroller>
 ```
 
-
-
-### better-scroller中的点击跳转配置
+### `better-scroller`中的点击跳转配置
 
 **设置**：
 
@@ -1554,8 +1484,6 @@ methods: {
 }
 ```
 
-
-
 **使用**：
 
 ```html
@@ -1573,7 +1501,7 @@ handleToIndex(index) {
 
 
 
-# 封装`loading`组件
+# 21.封装`loading`组件
 
 我们采用的是`CSS3`去做一个`loading`的动画实现，不要使用图片，因为图片本身也是需要发起请求的。
 
@@ -1754,7 +1682,7 @@ Vue.component('Loading', Loading)
 
 
 
-# 城市组件中的状态管理和本地存储
+# 22.城市组件中的状态管理和本地存储
 
 ## 本地存储
 
@@ -1797,24 +1725,6 @@ mounted() {
 ```
 
 ![本地存储](C:\Users\lenovo\Desktop\5天背诵\17.mini_cinema项目需求\img\本地存储.jpg)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 ## 状态管理
 
@@ -1894,8 +1804,6 @@ export default {
 
 ![vuex](C:\Users\lenovo\Desktop\5天背诵\17.mini_cinema项目需求\img\vuex.jpg)
 
-
-
 ## 修改状态管理中的`nm`和`id`
 
 通过添加点击操作，分别给热门城市和分类中的`li`条件点击事件，并将`nm`和`id`传递过去：
@@ -1943,13 +1851,11 @@ const state = {
 }
 ```
 
-
-
 ![vuex状态管理](C:\Users\lenovo\Desktop\5天背诵\17.mini_cinema项目需求\img\vuex状态管理.jpg)
 
 
 
-# 联动数据
+# 23.联动数据
 
 以上我们已经实现城市的切换了，但是页面中显示的城市信息还是没有相对应的。
 
@@ -1972,8 +1878,6 @@ activated() {
   })
 }
 ```
-
-
 
 ## 需求：当且仅当我们从城市组件切换到正在热映组件的时候，需要重新发起网络请求数据，否则直接走缓存
 
@@ -2020,7 +1924,7 @@ watch() {
 
 
 
-# 定位
+# 24.定位
 
 ## 弹窗
 
@@ -2232,15 +2136,13 @@ mounted() {
 }
 ```
 
-
-
-## 传递阶段代码到git
+## 传递阶段代码到`git`
 
 ```shell
-git status // 查看修改了哪些代码
+git status  
 git add .
 git commit -m "..."
-git checkout dev // 切换到开发分支上
+git checkout dev  
 git merge getCity --no-ff // 融合
 git log // 查看日志
 git push ck dev
@@ -2251,7 +2153,7 @@ git status
 
 
 
-# 详情页
+# 25.详情页
 
 ```shell
 git checkout -b detailPage // 创建一个新分支
@@ -2404,8 +2306,6 @@ export default {
 </header>
 ```
 
-
-
 ## 命名视图处理路由问题
 
 ![命名视图](C:\Users\lenovo\Desktop\5天背诵\17.mini_cinema项目需求\img\命名视图.jpg)
@@ -2434,8 +2334,6 @@ export default {
     ]
 },
 ```
-
-
 
 ## 给详情页后退图标添加点击事件
 
@@ -2499,8 +2397,6 @@ methods: {
 
 以上便是完成了详情页的跳转和返回操作。
 
-
-
 ## 最后将传递过来的详情页根据id进行网络请求拿到数据
 
 因为我们使用的是命名视图去实现动态路由，所以使用字段`props`去实现：
@@ -2528,8 +2424,6 @@ export default {
     }
 }
 ```
-
-
 
 ## 当我们在详情页点击回退图标的时候，希望有一个动画效果
 
@@ -2570,9 +2464,7 @@ export default {
 
 如果有多个页面都是需要使用上述动画的，那么我们就将其再多写一份路由配置一下。
 
-
-
- ## 提交到git 
+ ## 提交到`git `
 
 ```shell
 git add .
@@ -2585,7 +2477,7 @@ git branch -d detailPage
 
 
 
-# 当我们第一次加载资源的时候，显示一个整体的加载动画
+# 26.当我们第一次加载资源的时候，显示一个整体的加载动画
 
 在`index.html`文件中：
 
@@ -2608,7 +2500,7 @@ git branch -d detailPage
 
 
 
-# 打包
+# 27.打包
 
 ## 关于路由访问的起始路径
 
@@ -2624,8 +2516,6 @@ const router = new VueRouter({
 ```
 
 ![base路由设置](C:\Users\lenovo\Desktop\5天背诵\17.mini_cinema项目需求\img\base路由设置.jpg)
-
-
 
 ## 关于静态资源的路径
 
@@ -2647,17 +2537,8 @@ module.exports = {
 }
 ```
 
-
-
 ## 打包
 
 ```shell
 npm run build
 ```
-
-
-
-
-
-
-
